@@ -1,0 +1,108 @@
+version: '3.8'
+
+services:
+  backend:
+    build: .
+    container_name: electronic_erp_backend
+    image: dilanthanayanajith/agriculture_backend:v1
+
+    ports:
+      - "5000:5000"
+
+    env_file:
+      - .env
+
+    environment:
+      - WATCHPACK_POLLING=true
+      - CHOKIDAR_USEPOLLING=true
+
+    volumes:
+      - .:/app # bind mount current directory to /app in container
+      - /app/node_modules # annonymous volume path 
+
+    stdin_open: true
+    tty: true
+
+    command: npm run start:dev
+
+    develop:
+      watch:
+        - action: sync
+          path: .
+          target: /app
+
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  mysql:
+    image: mysql:8
+    container_name: electronic_erp_db
+
+    ports:
+      - "3307:3306"
+
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASS}
+      MYSQL_DATABASE: ${DB_NAME}
+
+    volumes:
+      - mysql_data:/var/lib/mysql   #name volume:container path
+
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASS}"]
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mysql_data:
+
+
+# version: '3.8'
+
+# services:
+#   backend:
+#     build: .
+#     container_name: electronic_erp_backend
+
+#     ports:
+#       - "5000:5000"
+
+#     env_file:
+#       - .env
+
+#     environment:
+#       - WATCHPACK_POLLING=true
+#       - CHOKIDAR_USEPOLLING=true
+
+#     volumes:
+#       - .:/app
+#       - /app/node_modules
+
+#     command: npm run start:dev
+
+#     depends_on:
+#       mysql:
+#         condition: service_healthy
+
+#   mysql:
+#     image: mysql:8
+#     container_name: electronic_erp_db
+
+#     ports:
+#       - "3307:3306"
+
+#     environment:
+#       MYSQL_ROOT_PASSWORD: ${DB_PASS}
+#       MYSQL_DATABASE: ${DB_NAME}
+
+#     volumes:
+#       - mysql_data:/var/lib/mysql
+
+#     healthcheck:
+#       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASS}"]
+#       timeout: 5s
+#       retries: 5
+
+# volumes:
+#   mysql_data:
