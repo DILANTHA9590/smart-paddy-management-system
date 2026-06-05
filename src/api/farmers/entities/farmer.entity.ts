@@ -13,10 +13,7 @@ import {
 @Entity("farmers")
 export class Farmer {
   @PrimaryGeneratedColumn()
-  id!: number;
-
-  @Column()
-  user_id!: number;
+  id!: string;
 
   @ManyToOne(() => User, (user) => user.farmers, {
     onDelete: "CASCADE",

@@ -6,10 +6,12 @@ import {
   UpdateDateColumn,
   Index,
   ManyToOne,
-  JoinColumn
+  JoinColumn,
+  OneToMany
 } from 'typeorm';
 import { USER_STATUS } from './user-status.enum';
 import { Role } from 'src/api/roles/entities/role.entity';
+import { Farmer } from 'src/api/farmers/entities/farmer.entity';
 
 @Entity('users')
 export class User {
@@ -59,4 +61,10 @@ export class User {
   @ManyToOne(() => Role, role => role.users)
   @JoinColumn({ name: 'role_id' })
   role!: Role;
+
+
+  
+@OneToMany(() => Farmer, (farmer) => farmer.user)
+farmers!: Farmer[];
+
 }
