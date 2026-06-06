@@ -28,6 +28,8 @@ export class UserService {
       private configService: ConfigService
     ){}
 
+
+    //create  new user
 async create(createUserDto: CreateUserDto):Promise<ApiResponseDto<null>>{
   const { email, userName, password } = createUserDto;
 
@@ -82,6 +84,7 @@ async create(createUserDto: CreateUserDto):Promise<ApiResponseDto<null>>{
 }
 
 
+// get all user and filter all users  
 async getAllUsers(dto:SearchUsersDto):Promise<ApiResponseDto<PaginatedDto<User>>> {
 
 const {limit,search,page,status} = dto
@@ -135,9 +138,10 @@ return{
 
 
 
-
-
   }
+
+
+  //  find user by id 
 
 async findOne({id}: UuidParamDto):Promise<ApiResponseDto<User>> {
 
@@ -157,8 +161,7 @@ async findOne({id}: UuidParamDto):Promise<ApiResponseDto<User>> {
 
 
   }
-
-
+//update user
 
 async update(
   id: string,
@@ -187,6 +190,8 @@ async update(
   };
 }
 
+
+// remove user 
  async remove(id: string):Promise<ApiResponseDto<null>> {
    
   const existingUser = await this.userRepository.findOne({
@@ -208,7 +213,7 @@ async update(
   }
 
 
-
+//Assign new role for users
 async  assignUserRole(dto:AssignUserRoleDto ,payload:JwtPayloadDto):Promise<ApiResponseDto<null>>{
 
   const {sub}=payload // req user id
