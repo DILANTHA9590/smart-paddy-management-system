@@ -137,3 +137,8 @@ This project is being developed as a Final Year Software Engineering Project foc
 ## 📄 License
 
 This project is developed for academic and research purposes.
+
+# Documentation
+
+- [System Design](./SYSTEM_DESIGN.md)
+- [API Documentation](./API_DOCUMENTATION.md)
