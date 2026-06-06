@@ -1,15 +1,39 @@
 import { User } from 'src/api/user/entities/user.entity';
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import { USER_ROLE } from './role.enum';
-
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { UserRole } from './role.enum';
 
 @Entity('roles')
 export class Role {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ unique: true })
-  roleName!: USER_ROLE; // ADMIN, STAFF
+  @Column({
+    type: 'enum',
+    enum: UserRole,
+    unique: true,
+  })
+  roleName!: UserRole;
+
+
+  @Column({ nullable: true })
+  description?: string;
+
+  
+  @Column({ nullable: true })
+  updatedBy?: string;
+
+  @CreateDateColumn()
+  createdAt!: Date;
+
+  @UpdateDateColumn()
+  updatedAt!: Date;
 
   @OneToMany(() => User, (user) => user.role)
   users?: User[];
