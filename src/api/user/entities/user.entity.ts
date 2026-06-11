@@ -7,7 +7,8 @@ import {
   Index,
   ManyToOne,
   JoinColumn,
-  OneToMany
+  OneToMany,
+  OneToOne
 } from 'typeorm';
 import { USER_STATUS } from './user-status.enum';
 import { Role } from 'src/api/roles/entities/role.entity';
@@ -58,13 +59,16 @@ export class User {
 
   @UpdateDateColumn()
   updatedAt!: Date;
+
   @ManyToOne(() => Role, role => role.users)
   @JoinColumn({ name: 'role_id' })
   role!: Role;
 
+  
+@OneToOne(() => Farmer, (farmer) => farmer.user)
+farmer?: Farmer;
 
   
-@OneToMany(() => Farmer, (farmer) => farmer.user)
-farmers!: Farmer[];
+
 
 }
