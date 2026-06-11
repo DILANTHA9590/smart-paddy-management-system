@@ -7,6 +7,7 @@ import {
   UpdateDateColumn,
   ManyToOne,
   JoinColumn,
+  OneToOne,
 } from "typeorm";
 
 
@@ -15,11 +16,11 @@ export class Farmer {
   @PrimaryGeneratedColumn()
   id!: string;
 
-  @ManyToOne(() => User, (user) => user.farmers, {
-    onDelete: "CASCADE",
-  })
-  @JoinColumn({ name: "user_id" })
-  user!: User;
+@OneToOne(() => User, (user) => user.farmer, {
+  onDelete: "CASCADE",
+})
+@JoinColumn({ name: "user_id" })
+user!: User;
 
   @Column({ unique: true })
   nic!: string;
