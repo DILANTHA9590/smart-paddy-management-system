@@ -6,6 +6,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ScheduleModule } from '@nestjs/schedule';
 import { RolesModule } from './api/roles/roles.module';
 import { FarmersModule } from './api/farmers/farmers.module';
+import { OtpModule } from './api/otp/otp.module';
+import { RedisModule } from './api/redis/redis.module';
 
 
 
@@ -40,6 +42,8 @@ import { FarmersModule } from './api/farmers/farmers.module';
     AuthModule,
     RolesModule,
     FarmersModule,
+    OtpModule,
+    RedisModule,
   ]
 
 })
