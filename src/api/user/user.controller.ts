@@ -18,6 +18,7 @@ import {
   ApiOperation,
   ApiResponse,
   ApiParam,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 
 import { UserService } from './user.service';
@@ -33,6 +34,7 @@ import { PaginatedDto } from 'src/common/dto/paginated.dto';
 
 @ApiTags('Users')
 @Controller('user')
+@ApiBearerAuth()
 // @UseGuards(AuthGuard('jwt'))
 export class UserController {
   constructor(private readonly userService: UserService) {}
