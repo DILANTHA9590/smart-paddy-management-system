@@ -46,4 +46,44 @@ export class RolesService {
   };
 }
   
+
+async findOne(id: string):Promise<ApiResponseDto<Role>> {
+
+    const role = await this.roleRepository.findOne({
+      where:{
+        id
+      }
+    })
+
+    if(!role) throw new NotFoundException("This role name not found")
+
+    return{
+    success: true,
+    message: `Role retrieved successfully`,
+    data: role
+    }
+  
+  }
+
+  async remove(id: string):Promise<ApiResponseDto<null>> {
+
+     const role = await this.roleRepository.findOne({
+      where:{
+        id
+      }
+    })
+
+    if(!role) throw new NotFoundException("This role name not found")
+
+
+    await this.roleRepository.remove(role)  
+
+
+    return{
+    success: true,
+    message: `Role deleted successfully`,
+    data: null
+    }
+
+  }
 }
