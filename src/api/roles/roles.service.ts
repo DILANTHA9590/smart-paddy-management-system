@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -27,38 +27,23 @@ export class RolesService {
 
     return{
     success: true,
-    message: 'rOLE created successfully',
+    message: `Role ${roleName} created successfully`,
     data:null
 
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
   }
 
-  findAll() {
-    return `This action returns all roles`;
-  }
+ async findAll(name: string):Promise<ApiResponseDto<Role[]>> {
+  const roles = await this.roleRepository.createQueryBuilder('role')
+    .where('role.roleName LIKE :name', { name: `%${name}%` })
+    .getMany();
 
-  findOne(id: number) {
-    return `This action returns a #${id} role`;
-  }
-
-  update(id: number, updateRoleDto: UpdateRoleDto) {
-    return `This action updates a #${id} role`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} role`;
-  }
+  return {
+    success: true,
+    message: `Roles retrieved successfully`,
+    data: roles
+  };
+}
+  
 }
