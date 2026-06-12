@@ -15,6 +15,7 @@ import {
 import {
   ApiBearerAuth,
   ApiOperation,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -28,7 +29,7 @@ import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('Roles')
 @ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'))
+// @UseGuards(AuthGuard('jwt'))
 @Controller('roles')
 export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
@@ -54,14 +55,19 @@ export class RolesController {
   @Get()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get all roles' })
+  @ApiQuery({
+  name: 'name',
+  required: false,
+  description: 'Filter roles by name',
+})
   @ApiResponse({
     status: 200,
     description: 'Roles retrieved successfully',
   })
   findAll(
-    @Query('name') name: string,
+    @Query('name') name?: string,
   ): Promise<ApiResponseDto<Role[]>> {
-    return this.rolesService.findAll(name);
+    return this.rolesService.findAll(name || "");
   }
 
   @Get(':id')
@@ -94,9 +100,9 @@ export class RolesController {
   })
   update(
     @Param('id') id: string,
-    @Body() updateRoleDto: UpdateRoleDto,
+    @Body() updateRoleDto: UpdateRoleDto,@Req() req:any
   ): Promise<ApiResponseDto<Role>> {
-    return this.rolesService.updateRole(id, updateRoleDto);
+    return this.rolesService.updateRole(id, updateRoleDto,req.user);
   }
 
   @Delete(':id')

@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Role } from './entities/role.entity';
 import { Repository } from 'typeorm';
 import { ApiResponseDto } from 'src/common/dto/api-respose-dto';
+import { JwtPayloadDto } from '../auth/dto/jwtPayload';
 // x
 @Injectable()
 export class RolesService {
@@ -31,7 +32,7 @@ export class RolesService {
 
   }
 
- async findAll(name: string):Promise<ApiResponseDto<Role[]>> {
+ async findAll(name?:string  ):Promise<ApiResponseDto<Role[]>> {
   const roles = await this.roleRepository.createQueryBuilder('role')
     .where('role.roleName LIKE :name', { name: `%${name}%` })
     .getMany();
@@ -86,7 +87,7 @@ async findOne(id: string):Promise<ApiResponseDto<Role>> {
 
 
 
-  async updateRole(id:string,dto:UpdateRoleDto):Promise<ApiResponseDto<Role>>{
+  async updateRole(id:string,dto:UpdateRoleDto,user:JwtPayloadDto):Promise<ApiResponseDto<Role>>{
      const role = await this.roleRepository.findOne({
       where:{
         id
@@ -96,7 +97,7 @@ async findOne(id: string):Promise<ApiResponseDto<Role>> {
 
     const newroleData =  this.roleRepository.merge(role,dto)
 
-    await this.roleRepository.save(newroleData);
+    await this.roleRepository.save({...newroleData,updatedBy:user?.sub});
 
 
     return{
