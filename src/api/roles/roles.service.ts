@@ -1,11 +1,49 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Role } from './entities/role.entity';
+import { Repository } from 'typeorm';
+import { ApiResponseDto } from 'src/common/dto/api-respose-dto';
 
 @Injectable()
 export class RolesService {
-  create(createRoleDto: CreateRoleDto) {
-    return 'This action adds a new role';
+  constructor(
+  @InjectRepository
+  (Role) private readonly roleRepository: Repository<Role>,
+  ){}
+  async create(createRoleDto: CreateRoleDto ,id:string):Promise<ApiResponseDto<null>> {
+    const {roleName}=createRoleDto
+
+    const existingRole = await this.roleRepository.createQueryBuilder('role')
+    .where('role.roleName = :name',{roleName})
+    .getOne()
+
+    if (existingRole)  throw new ConflictException("Role already exists")
+
+
+    await this.roleRepository.save(createRoleDto)  
+
+
+    return{
+    success: true,
+    message: 'rOLE created successfully',
+    data:null
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
   }
 
   findAll() {
