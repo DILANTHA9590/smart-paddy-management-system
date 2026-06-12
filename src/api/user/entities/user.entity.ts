@@ -11,8 +11,8 @@ import {
   OneToOne
 } from 'typeorm';
 import { USER_STATUS } from './user-status.enum';
-import { Role } from 'src/api/roles/entities/role.entity';
-import { Farmer } from 'src/api/farmers/entities/farmer.entity';
+import { Role } from '../../roles/entities/role.entity'; // ✅ Absolute පාර Relative කළා
+import { Farmer } from '../../farmers/entities/farmer.entity'; // ✅ මේකත් Relative කළා
 
 @Entity('users')
 export class User {
