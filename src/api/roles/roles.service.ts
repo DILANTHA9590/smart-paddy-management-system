@@ -86,4 +86,32 @@ async findOne(id: string):Promise<ApiResponseDto<Role>> {
     }
 
   }
+
+
+
+  async updateRole(id:string,dto:UpdateRoleDto):Promise<ApiResponseDto<Role>>{
+     const role = await this.roleRepository.findOne({
+      where:{
+        id
+      }
+    })
+    if(!role) throw new NotFoundException("This role  not found")
+
+    const newroleData =  this.roleRepository.merge(role,dto)
+
+    await this.roleRepository.save(newroleData);
+
+
+    return{
+    success: true,
+    message: `Role updated successfully`,
+    data: newroleData
+    }
+
+
+
+
+
+
+  }
 }
