@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Role } from './entities/role.entity';
 import { Repository } from 'typeorm';
 import { ApiResponseDto } from 'src/common/dto/api-respose-dto';
-
+// x
 @Injectable()
 export class RolesService {
   constructor(
@@ -14,13 +14,10 @@ export class RolesService {
   ){}
   async create(createRoleDto: CreateRoleDto ,id:string):Promise<ApiResponseDto<null>> {
     const {roleName}=createRoleDto
-
     const existingRole = await this.roleRepository.createQueryBuilder('role')
-    .where('role.roleName = :name',{roleName})
+    .where('role.roleName = :roleName',{roleName})
     .getOne()
-
     if (existingRole)  throw new ConflictException("Role already exists")
-
 
     await this.roleRepository.save(createRoleDto)  
 
