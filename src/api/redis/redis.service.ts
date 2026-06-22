@@ -1,13 +1,16 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Redis from 'ioredis';
+
 
 @Injectable()
 export class RedisService implements OnModuleInit {
   private readonly redis: Redis;
 
+
   constructor(
     private readonly configService: ConfigService,
+
   ) {
     console.log('🔥 RedisService Constructor');
 
@@ -31,6 +34,7 @@ export class RedisService implements OnModuleInit {
 
 
   async getClient():Promise<Redis> {
+
     return this.redis;
   }
 

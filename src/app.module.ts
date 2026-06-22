@@ -8,6 +8,7 @@ import { RolesModule } from './api/roles/roles.module';
 import { FarmersModule } from './api/farmers/farmers.module';
 import { OtpModule } from './api/otp/otp.module';
 import { RedisModule } from './api/redis/redis.module';
+import { EmailModule } from './api/email/email.module';
 
 
 
@@ -44,6 +45,7 @@ import { RedisModule } from './api/redis/redis.module';
     FarmersModule,
     OtpModule,
     RedisModule,
+    EmailModule,
   ]
 
 })
