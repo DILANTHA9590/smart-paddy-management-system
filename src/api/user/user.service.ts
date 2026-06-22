@@ -91,6 +91,24 @@ async create(createUserDto: CreateUserDto):Promise<ApiResponseDto<null>>{
 }
 
 
+
+async resendOtp(email: string): Promise<ApiResponseDto<null>> {
+  const user = await this.userRepository.findOne({
+    where: { email },
+  });
+
+  if (!user) {
+    throw new NotFoundException('User not found');
+  }
+
+  if (user.isVerified) {
+    throw new BadRequestException('User already verified');
+  }
+
+  return this.otpService.resendOtp(email);
+}
+
+
 // get all user and filter all users  
 async getAllUsers(dto:SearchUsersDto):Promise<ApiResponseDto<PaginatedDto<User>>> {
 

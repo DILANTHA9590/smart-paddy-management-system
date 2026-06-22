@@ -42,4 +42,16 @@ export class OtpService {
   }
 
 
+
+  async resendOtp(email:string){
+  try{
+        const existingValue = await this.rediseService.getRedis(email)
+
+  } catch(err){
+
+  }
+  
+
+  }
+
 }
