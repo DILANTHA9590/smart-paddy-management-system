@@ -29,7 +29,23 @@ export class RedisService implements OnModuleInit {
   }
 
 
-  getClient(): Redis {
+
+  async getClient():Promise<Redis> {
     return this.redis;
+  }
+
+ async setRedis(key:string,value:string):Promise<string>{
+        return this.redis.set(key, value,'EX',this.configService.getOrThrow<number>('OTP_EXPIRE_SECONDS'));
+  }
+
+async getRedis(key:string):Promise<string|null>{
+    return  this.redis.get(key);
+  }
+
+ async deleteRedis(key:string):Promise<number>{
+
+   return this.redis.del(key)
+
+
   }
 }
