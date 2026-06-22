@@ -17,6 +17,8 @@ import { Role } from '../roles/entities/role.entity';
 import { TokenPayload } from '../auth/interfaces/auth.interface';
 import { JwtPayloadDto } from '../auth/dto/jwtPayload';
 import { AssignUserRoleDto } from './dto/assign-user_role.dto';
+import { RedisService } from '../redis/redis.service';
+import { OtpService } from '../otp/otp.service';
 
 @Injectable()
 export class UserService {
@@ -25,7 +27,8 @@ export class UserService {
       (User) private readonly userRepository: Repository<User>,
       @InjectRepository
       (Role) private readonly roleRepository: Repository<Role>,
-      private configService: ConfigService
+      private configService: ConfigService,
+      private otpService:OtpService
     ){}
 
 
@@ -50,6 +53,8 @@ async create(createUserDto: CreateUserDto):Promise<ApiResponseDto<null>>{
     }
   }
 
+
+
   // 🔐 Get Pepper from .env
   const pepper = this.configService.getOrThrow<string>('PASSWORD_PEPPER');
 
@@ -69,6 +74,8 @@ async create(createUserDto: CreateUserDto):Promise<ApiResponseDto<null>>{
   });
 
   await this.userRepository.save(newUser);
+ await this.otpService.create(email)
+  
 
   return {
     success: true,
