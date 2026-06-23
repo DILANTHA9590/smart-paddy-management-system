@@ -10,8 +10,6 @@ import { OtpModule } from './api/otp/otp.module';
 import { RedisModule } from './api/redis/redis.module';
 import { EmailModule } from './api/email/email.module';
 
-
-
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -20,7 +18,7 @@ import { EmailModule } from './api/email/email.module';
     }),
 
     ScheduleModule.forRoot(),
-     TypeOrmModule.forRootAsync({
+    TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
@@ -32,9 +30,9 @@ import { EmailModule } from './api/email/email.module';
         database: configService.getOrThrow('DB_NAME'),
         autoLoadEntities: true,
         synchronize: true,
-        logging: ['query', 'error'],//dev
-    // logging: ['error'],//prodction
-        retryAttempts: 5, 
+        logging: ['query', 'error'], //dev
+        // logging: ['error'],//prodction
+        retryAttempts: 5,
         retryDelay: 3000,
       }),
     }),
@@ -46,7 +44,6 @@ import { EmailModule } from './api/email/email.module';
     OtpModule,
     RedisModule,
     EmailModule,
-  ]
-
+  ],
 })
 export class AppModule {}

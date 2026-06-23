@@ -1,15 +1,12 @@
-import { Injectable, InternalServerErrorException, } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateEmailDto } from './dto/create-email.dto';
 import { UpdateEmailDto } from './dto/update-email.dto';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 @Injectable()
 export class EmailService {
-
   private transporter: nodemailer.Transporter;
-  constructor(private readonly configService:ConfigService) {
-    
-
+  constructor(private readonly configService: ConfigService) {
     this.transporter = nodemailer.createTransport({
       host: this.configService.getOrThrow<string>('MAIL_HOST'),
       port: Number(this.configService.getOrThrow<string>('MAIL_PORT')),
@@ -41,6 +38,4 @@ export class EmailService {
       throw new InternalServerErrorException('Failed to send OTP email');
     }
   }
-
- 
 }

@@ -5,9 +5,9 @@ import { RedisModule } from '../redis/redis.module';
 import { EmailModule } from '../email/email.module';
 
 @Module({
-   imports: [RedisModule, EmailModule],
+  imports: [RedisModule, EmailModule],
   controllers: [OtpController],
   providers: [OtpService],
-  exports:[OtpService]
+  exports: [OtpService],
 })
 export class OtpModule {}

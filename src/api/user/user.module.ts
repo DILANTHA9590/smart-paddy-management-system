@@ -7,7 +7,7 @@ import { Role } from '../roles/entities/role.entity';
 import { OtpModule } from '../otp/otp.module';
 
 @Module({
-   imports: [TypeOrmModule.forFeature([User,Role]),OtpModule],
+  imports: [TypeOrmModule.forFeature([User, Role]), OtpModule],
   controllers: [UserController],
   providers: [UserService],
 })

@@ -1,4 +1,3 @@
-
 export class PaginatedDto<T> {
   items?: T[];
   totalPages?: number;

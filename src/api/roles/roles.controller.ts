@@ -56,18 +56,16 @@ export class RolesController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get all roles' })
   @ApiQuery({
-  name: 'name',
-  required: false,
-  description: 'Filter roles by name',
-})
+    name: 'name',
+    required: false,
+    description: 'Filter roles by name',
+  })
   @ApiResponse({
     status: 200,
     description: 'Roles retrieved successfully',
   })
-  findAll(
-    @Query('name') name?: string,
-  ): Promise<ApiResponseDto<Role[]>> {
-    return this.rolesService.findAll(name || "");
+  findAll(@Query('name') name?: string): Promise<ApiResponseDto<Role[]>> {
+    return this.rolesService.findAll(name || '');
   }
 
   @Get(':id')
@@ -81,9 +79,7 @@ export class RolesController {
     status: 404,
     description: 'Role not found',
   })
-  findOne(
-    @Param('id') id: string,
-  ): Promise<ApiResponseDto<Role>> {
+  findOne(@Param('id') id: string): Promise<ApiResponseDto<Role>> {
     return this.rolesService.findOne(id);
   }
 
@@ -100,9 +96,10 @@ export class RolesController {
   })
   update(
     @Param('id') id: string,
-    @Body() updateRoleDto: UpdateRoleDto,@Req() req:any
+    @Body() updateRoleDto: UpdateRoleDto,
+    @Req() req: any,
   ): Promise<ApiResponseDto<Role>> {
-    return this.rolesService.updateRole(id, updateRoleDto,req.user);
+    return this.rolesService.updateRole(id, updateRoleDto, req.user);
   }
 
   @Delete(':id')
@@ -116,9 +113,7 @@ export class RolesController {
     status: 404,
     description: 'Role not found',
   })
-  remove(
-    @Param('id') id: string,
-  ): Promise<ApiResponseDto<null>> {
+  remove(@Param('id') id: string): Promise<ApiResponseDto<null>> {
     return this.rolesService.remove(id);
   }
 }

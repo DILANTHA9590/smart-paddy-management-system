@@ -5,17 +5,16 @@ import {
   IsOptional,
   IsPhoneNumber,
   IsString,
-} from "class-validator";
-import { Type } from "class-transformer";
-import { PrimaryGeneratedColumn } from "typeorm";
-import { Gender } from "../gender.enum";
+} from 'class-validator';
+import { Type } from 'class-transformer';
+import { PrimaryGeneratedColumn } from 'typeorm';
+import { Gender } from '../gender.enum';
 
 export class CreateFarmerDto {
-
-  @PrimaryGeneratedColumn() 
+  @PrimaryGeneratedColumn()
   @IsOptional()
-  @IsString() 
-  id!:string
+  @IsString()
+  id!: string;
 
   @IsString()
   @IsNotEmpty()
@@ -45,8 +44,8 @@ export class CreateFarmerDto {
   @IsDate()
   date_of_birth!: Date;
 
- @IsEnum(Gender)
- gender!: Gender;
+  @IsEnum(Gender)
+  gender!: Gender;
 
   @IsOptional()
   @IsString()

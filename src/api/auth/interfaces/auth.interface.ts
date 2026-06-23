@@ -1,19 +1,17 @@
-import { USER_STATUS } from "src/api/user/entities/user-status.enum";
+import { USER_STATUS } from 'src/api/user/entities/user-status.enum';
 
 export interface accessToken {
-    sub:string,
-    firstName:string,
-    lastName?:string,
-    tokenVersion?:number,
-    email?:string
-    userStatus:USER_STATUS
-
+  sub: string;
+  firstName: string;
+  lastName?: string;
+  tokenVersion?: number;
+  email?: string;
+  userStatus: USER_STATUS;
 }
 
-
-export interface refreshToken  {
-    sub:string,
-    tokenVersion?:number,
+export interface refreshToken {
+  sub: string;
+  tokenVersion?: number;
 }
 // auth/interfaces/token-payload.interface.ts
 

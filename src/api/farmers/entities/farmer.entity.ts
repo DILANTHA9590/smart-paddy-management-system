@@ -1,4 +1,4 @@
-import { User } from "../../user/entities/user.entity";
+import { User } from '../../user/entities/user.entity';
 
 import {
   Entity,
@@ -9,19 +9,18 @@ import {
   ManyToOne,
   JoinColumn,
   OneToOne,
-} from "typeorm";
+} from 'typeorm';
 
-
-@Entity("farmers")
+@Entity('farmers')
 export class Farmer {
   @PrimaryGeneratedColumn()
   id!: string;
 
-@OneToOne(() => User, (user) => user.farmer, {
-  onDelete: "CASCADE",
-})
-@JoinColumn({ name: "user_id" })
-user!: User;
+  @OneToOne(() => User, (user) => user.farmer, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'user_id' })
+  user!: User;
 
   @Column({ unique: true })
   nic!: string;
@@ -29,7 +28,7 @@ user!: User;
   @Column()
   phone_number!: string;
 
-  @Column("text")
+  @Column('text')
   address!: string;
 
   @Column()
@@ -41,12 +40,12 @@ user!: User;
   @Column()
   village!: string;
 
-  @Column({ type: "date" })
+  @Column({ type: 'date' })
   date_of_birth!: Date;
 
   @Column({
-    type: "enum",
-    enum: ["Male", "Female", "Other"],
+    type: 'enum',
+    enum: ['Male', 'Female', 'Other'],
   })
   gender!: string;
 
@@ -56,16 +55,16 @@ user!: User;
   @Column({ nullable: true })
   organization_id?: number;
 
-//   @ManyToOne(
-//     () => Organization,
-//     (organization) => organization.farmers,
-//     {
-//       nullable: true,
-//       onDelete: "SET NULL",
-//     }
-//   )
-//   @JoinColumn({ name: "organization_id" })
-//   organization: Organization;
+  //   @ManyToOne(
+  //     () => Organization,
+  //     (organization) => organization.farmers,
+  //     {
+  //       nullable: true,
+  //       onDelete: "SET NULL",
+  //     }
+  //   )
+  //   @JoinColumn({ name: "organization_id" })
+  //   organization: Organization;
 
   @CreateDateColumn()
   created_at!: Date;

@@ -51,40 +51,35 @@ export class UserController {
     status: 201,
     description: 'User created successfully',
   })
-  create(@Body() createUserDto: CreateUserDto):Promise<ApiResponseDto<null>> {
-
+  create(@Body() createUserDto: CreateUserDto): Promise<ApiResponseDto<null>> {
     return this.userService.create(createUserDto);
   }
-
 
   @Post('resend/otp')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
-  summary: 'Generate OTP',
-  description: 'This endpoint is used to generate and send an OTP to the provided email address.',
-})
-
+    summary: 'Generate OTP',
+    description:
+      'This endpoint is used to generate and send an OTP to the provided email address.',
+  })
   @ApiResponse({
     status: 201,
     description: 'Otp resend successfully',
   })
-  resendOtp(@Body() dto:ResendOtpDto ):Promise<ApiResponseDto<null>> {
-
+  resendOtp(@Body() dto: ResendOtpDto): Promise<ApiResponseDto<null>> {
     return this.userService.resendOtp(dto);
   }
 
-
-@Get('all')
+  @Get('all')
   @ApiOperation({
-  summary: 'Get all users',
-  description: 'Fetch all users with pagination and search'
-})
-
-getAll(
-  @Query() dto: SearchUsersDto
-):Promise<ApiResponseDto<PaginatedDto<User>>> {
-  return this.userService.getAllUsers(dto);
-}
+    summary: 'Get all users',
+    description: 'Fetch all users with pagination and search',
+  })
+  getAll(
+    @Query() dto: SearchUsersDto,
+  ): Promise<ApiResponseDto<PaginatedDto<User>>> {
+    return this.userService.getAllUsers(dto);
+  }
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
@@ -103,18 +98,17 @@ getAll(
     status: 404,
     description: 'User not found',
   })
-  findOne(@Param('id') id: UuidParamDto):Promise<ApiResponseDto<User>> {
+  findOne(@Param('id') id: UuidParamDto): Promise<ApiResponseDto<User>> {
     return this.userService.findOne(id);
   }
 
-  @Patch("assign_role")
-   assignUserRole(@Body() dto:AssignUserRoleDto, @Req() req:any ):Promise<ApiResponseDto<null>>{
-    
-   return this.userService.assignUserRole(dto,req.user)
-
-
-   }
-
+  @Patch('assign_role')
+  assignUserRole(
+    @Body() dto: AssignUserRoleDto,
+    @Req() req: any,
+  ): Promise<ApiResponseDto<null>> {
+    return this.userService.assignUserRole(dto, req.user);
+  }
 
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
@@ -130,10 +124,7 @@ getAll(
     status: 200,
     description: 'User updated successfully',
   })
-  update(
-    @Param('id') id: string,
-    @Body() updateUserDto: UpdateUserDto,
-  ) {
+  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(id, updateUserDto);
   }
 
@@ -154,11 +145,4 @@ getAll(
   remove(@Param('id') id: string) {
     return this.userService.remove(id);
   }
-
-
-
-
-  
-
-
 }

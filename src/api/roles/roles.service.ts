@@ -1,4 +1,8 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -10,106 +14,95 @@ import { JwtPayloadDto } from '../auth/dto/jwtPayload';
 @Injectable()
 export class RolesService {
   constructor(
-  @InjectRepository
-  (Role) private readonly roleRepository: Repository<Role>,
-  ){}
-  async create(createRoleDto: CreateRoleDto ,id:string):Promise<ApiResponseDto<null>> {
-    const {roleName}=createRoleDto
-    const existingRole = await this.roleRepository.createQueryBuilder('role')
-    .where('role.roleName = :roleName',{roleName})
-    .getOne()
-    if (existingRole)  throw new ConflictException("Role already exists")
+    @InjectRepository(Role) private readonly roleRepository: Repository<Role>,
+  ) {}
+  async create(
+    createRoleDto: CreateRoleDto,
+    id: string,
+  ): Promise<ApiResponseDto<null>> {
+    const { roleName } = createRoleDto;
+    const existingRole = await this.roleRepository
+      .createQueryBuilder('role')
+      .where('role.roleName = :roleName', { roleName })
+      .getOne();
+    if (existingRole) throw new ConflictException('Role already exists');
 
-    await this.roleRepository.save(createRoleDto)  
+    await this.roleRepository.save(createRoleDto);
 
-
-    return{
-    success: true,
-    message: `Role ${roleName} created successfully`,
-    data:null
-
-    }
-
+    return {
+      success: true,
+      message: `Role ${roleName} created successfully`,
+      data: null,
+    };
   }
 
- async findAll(name?:string  ):Promise<ApiResponseDto<Role[]>> {
-  const roles = await this.roleRepository.createQueryBuilder('role')
-    .where('role.roleName LIKE :name', { name: `%${name}%` })
-    .getMany();
+  async findAll(name?: string): Promise<ApiResponseDto<Role[]>> {
+    const roles = await this.roleRepository
+      .createQueryBuilder('role')
+      .where('role.roleName LIKE :name', { name: `%${name}%` })
+      .getMany();
 
-  return {
-    success: true,
-    message: `Roles retrieved successfully`,
-    data: roles
-  };
-}
-  
+    return {
+      success: true,
+      message: `Roles retrieved successfully`,
+      data: roles,
+    };
+  }
 
-async findOne(id: string):Promise<ApiResponseDto<Role>> {
-
+  async findOne(id: string): Promise<ApiResponseDto<Role>> {
     const role = await this.roleRepository.findOne({
-      where:{
-        id
-      }
-    })
+      where: {
+        id,
+      },
+    });
 
-    if(!role) throw new NotFoundException("This role name not found")
+    if (!role) throw new NotFoundException('This role name not found');
 
-    return{
-    success: true,
-    message: `Role retrieved successfully`,
-    data: role
-    }
-  
+    return {
+      success: true,
+      message: `Role retrieved successfully`,
+      data: role,
+    };
   }
 
-  async remove(id: string):Promise<ApiResponseDto<null>> {
+  async remove(id: string): Promise<ApiResponseDto<null>> {
+    const role = await this.roleRepository.findOne({
+      where: {
+        id,
+      },
+    });
 
-     const role = await this.roleRepository.findOne({
-      where:{
-        id
-      }
-    })
+    if (!role) throw new NotFoundException('This role name not found');
 
-    if(!role) throw new NotFoundException("This role name not found")
+    await this.roleRepository.remove(role);
 
-
-    await this.roleRepository.remove(role)  
-
-
-    return{
-    success: true,
-    message: `Role deleted successfully`,
-    data: null
-    }
-
+    return {
+      success: true,
+      message: `Role deleted successfully`,
+      data: null,
+    };
   }
 
+  async updateRole(
+    id: string,
+    dto: UpdateRoleDto,
+    user: JwtPayloadDto,
+  ): Promise<ApiResponseDto<Role>> {
+    const role = await this.roleRepository.findOne({
+      where: {
+        id,
+      },
+    });
+    if (!role) throw new NotFoundException('This role  not found');
 
+    const newroleData = this.roleRepository.merge(role, dto);
 
-  async updateRole(id:string,dto:UpdateRoleDto,user:JwtPayloadDto):Promise<ApiResponseDto<Role>>{
-     const role = await this.roleRepository.findOne({
-      where:{
-        id
-      }
-    })
-    if(!role) throw new NotFoundException("This role  not found")
+    await this.roleRepository.save({ ...newroleData, updatedBy: user?.sub });
 
-    const newroleData =  this.roleRepository.merge(role,dto)
-
-    await this.roleRepository.save({...newroleData,updatedBy:user?.sub});
-
-
-    return{
-    success: true,
-    message: `Role updated successfully`,
-    data: newroleData
-    }
-
-
-
-
-
-
+    return {
+      success: true,
+      message: `Role updated successfully`,
+      data: newroleData,
+    };
   }
 }

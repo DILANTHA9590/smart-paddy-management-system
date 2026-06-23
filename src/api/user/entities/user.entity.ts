@@ -8,7 +8,7 @@ import {
   ManyToOne,
   JoinColumn,
   OneToMany,
-  OneToOne
+  OneToOne,
 } from 'typeorm';
 import { USER_STATUS } from './user-status.enum';
 import { Role } from '../../roles/entities/role.entity'; // ✅ Absolute පාර Relative කළා
@@ -16,11 +16,10 @@ import { Farmer } from '../../farmers/entities/farmer.entity'; // ✅ මේක�
 
 @Entity('users')
 export class User {
-
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({nullable:false})
+  @Column({ nullable: false })
   firstName!: string;
 
   @Column({ nullable: true })
@@ -36,12 +35,12 @@ export class User {
   isVerified!: boolean;
 
   @Column()
-  password!:string;
+  password!: string;
 
   @Column({
     type: 'enum',
     enum: USER_STATUS,
-    default: USER_STATUS.PENDING
+    default: USER_STATUS.PENDING,
   })
   userStatus!: USER_STATUS;
 
@@ -51,8 +50,8 @@ export class User {
   @Column({ nullable: true })
   salt?: string;
 
-  @Column({nullable:true})
-  assignedRoleBy?:string
+  @Column({ nullable: true })
+  assignedRoleBy?: string;
 
   @CreateDateColumn()
   createdAt!: Date;
@@ -60,15 +59,10 @@ export class User {
   @UpdateDateColumn()
   updatedAt!: Date;
 
-  @ManyToOne(() => Role, role => role.users)
+  @ManyToOne(() => Role, (role) => role.users)
   @JoinColumn({ name: 'role_id' })
   role!: Role;
 
-  
-@OneToOne(() => Farmer, (farmer) => farmer.user)
-farmer?: Farmer;
-
-  
-
-
+  @OneToOne(() => Farmer, (farmer) => farmer.user)
+  farmer?: Farmer;
 }

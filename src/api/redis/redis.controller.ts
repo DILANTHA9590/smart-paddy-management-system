@@ -5,7 +5,7 @@ import { RedisService } from './redis.service';
 export class RedisController {
   constructor(private readonly redisService: RedisService) {}
 
-  getClient(){
-    return this.redisService.getClient()
+  getClient() {
+    return this.redisService.getClient();
   }
 }

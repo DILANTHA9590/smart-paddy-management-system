@@ -14,8 +14,7 @@ async function bootstrap() {
   const port = configService.get<number>('PORT') || 3000;
 
   const clientUrl =
-    configService.get<string>('CLIENT_URL') ||
-    'http://localhost:3000';
+    configService.get<string>('CLIENT_URL') || 'http://localhost:3000';
 
   // 🔹 Global Prefix FIRST
   app.setGlobalPrefix('api/v1');
@@ -55,10 +54,7 @@ async function bootstrap() {
     .build();
 
   // 🔹 Create Swagger Document
-  const document = SwaggerModule.createDocument(
-    app,
-    swaggerConfig,
-  );
+  const document = SwaggerModule.createDocument(app, swaggerConfig);
 
   // 🔹 Setup Swagger UI
   SwaggerModule.setup('api/docs', app, document);
@@ -68,9 +64,7 @@ async function bootstrap() {
 
   console.log(`🚀 Server running on port: ${port}`);
 
-  console.log(
-    `📘 Swagger UI: http://localhost:${port}/api/docs`,
-  );
+  console.log(`📘 Swagger UI: http://localhost:${port}/api/docs`);
 }
 
 bootstrap();

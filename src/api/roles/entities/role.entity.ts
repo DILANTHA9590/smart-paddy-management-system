@@ -1,4 +1,4 @@
-import { User } from '../../user/entities/user.entity'; 
+import { User } from '../../user/entities/user.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -21,11 +21,9 @@ export class Role {
   })
   roleName!: UserRole;
 
-
   @Column({ nullable: true })
   description?: string;
 
-  
   @Column({ nullable: true })
   updatedBy?: string;
 
@@ -38,48 +36,3 @@ export class Role {
   @OneToMany(() => User, (user) => user.role)
   users?: User[];
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
