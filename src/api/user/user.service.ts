@@ -19,6 +19,7 @@ import { JwtPayloadDto } from '../auth/dto/jwtPayload';
 import { AssignUserRoleDto } from './dto/assign-user_role.dto';
 import { RedisService } from '../redis/redis.service';
 import { OtpService } from '../otp/otp.service';
+import { ResendOtpDto } from './dto/resend-otp.dto';
 
 @Injectable()
 export class UserService {
@@ -92,7 +93,10 @@ async create(createUserDto: CreateUserDto):Promise<ApiResponseDto<null>>{
 
 
 
-async resendOtp(email: string): Promise<ApiResponseDto<null>> {
+async resendOtp(dto:ResendOtpDto): Promise<ApiResponseDto<null>> {
+
+  const {email}=dto
+
   const user = await this.userRepository.findOne({
     where: { email },
   });
@@ -105,7 +109,15 @@ async resendOtp(email: string): Promise<ApiResponseDto<null>> {
     throw new BadRequestException('User already verified');
   }
 
-  return this.otpService.resendOtp(email);
+ await this.otpService.resendOtp(email);
+
+ 
+  return {
+    success: true,
+    message: 'Otp resent sucessfully',
+    data:null
+
+  };
 }
 
 

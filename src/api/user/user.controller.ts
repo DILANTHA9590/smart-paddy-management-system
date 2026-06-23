@@ -31,6 +31,8 @@ import { AssignUserRoleDto } from './dto/assign-user_role.dto';
 import { ApiResponseDto } from 'src/common/dto/api-respose-dto';
 import { User } from './entities/user.entity';
 import { PaginatedDto } from 'src/common/dto/paginated.dto';
+import { Email } from '../email/entities/email.entity';
+import { ResendOtpDto } from './dto/resend-otp.dto';
 
 @ApiTags('Users')
 @Controller('user')
@@ -55,8 +57,24 @@ export class UserController {
   }
 
 
-@Get('all')
+  @Post('resend/otp')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({
+  summary: 'Generate OTP',
+  description: 'This endpoint is used to generate and send an OTP to the provided email address.',
+})
 
+  @ApiResponse({
+    status: 201,
+    description: 'Otp resend successfully',
+  })
+  resendOtp(@Body() dto:ResendOtpDto ):Promise<ApiResponseDto<null>> {
+
+    return this.userService.resendOtp(dto);
+  }
+
+
+@Get('all')
   @ApiOperation({
   summary: 'Get all users',
   description: 'Fetch all users with pagination and search'

@@ -52,4 +52,8 @@ async getRedis(key:string):Promise<string|null>{
 
 
   }
+
+  async getTTL(key: string): Promise<number> {
+  return this.redis.ttl(key);
+}
 }

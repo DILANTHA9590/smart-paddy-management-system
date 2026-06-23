@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateOtpDto } from './dto/create-otp.dto';
 import { UpdateOtpDto } from './dto/update-otp.dto';
 import { RedisService } from '../redis/redis.service';
@@ -45,11 +45,22 @@ export class OtpService {
 
   async resendOtp(email:string){
   try{
-        const existingValue = await this.rediseService.getRedis(email)
+   const ttl =await this.rediseService.getTTL(email)    
+   if (ttl > 0) {
+  throw new BadRequestException(
+    `Please wait ${ttl} seconds before requesting a new OTP`,
+  );
+}
+   
 
-  } catch(err){
+   const otp = this.genarateOtp()
 
-  }
+   await this.emailService.sendOtp(email,otp)
+   await this.rediseService.setRedis(email,otp)
+ } catch(err){
+
+   throw new InternalServerErrorException("Failed to send OTP email")
+  }  
   
 
   }
