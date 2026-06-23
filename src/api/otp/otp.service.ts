@@ -3,6 +3,7 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { CreateOtpDto } from './dto/create-otp.dto';
 import { UpdateOtpDto } from './dto/update-otp.dto';
@@ -56,5 +57,22 @@ export class OtpService {
     } catch (err) {
       throw new InternalServerErrorException('Failed to send OTP email');
     }
+  }
+
+  async validateOtp(email:string,otp:string){
+
+    const existingOtp = await this.rediseService.getRedis(email)
+    if(!existingOtp) throw new NotFoundException("Otp Already Expired")
+    
+      
+    if(otp !== existingOtp){
+      throw new  BadRequestException("Please insert correct otp")
+    } 
+    
+    
+    return true
+
+    
+
   }
 }

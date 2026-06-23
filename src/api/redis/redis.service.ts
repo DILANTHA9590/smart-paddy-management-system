@@ -1,6 +1,7 @@
 import {
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
   OnModuleInit,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -51,5 +52,14 @@ export class RedisService implements OnModuleInit {
 
   async getTTL(key: string): Promise<number> {
     return this.redis.ttl(key);
+  }
+
+
+  async verifyUserOtp(key:string){
+    const otp = this.redis.get(key);
+    if(!otp) throw new NotFoundException("This Otp Already Expired" )
+    return true  
+
+
   }
 }

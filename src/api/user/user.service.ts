@@ -262,4 +262,40 @@ OR user.email LIKE :search`,
       data: null,
     };
   }
+
+
+  
+  async verifyUserOtp(dto:ResendOtpDto){
+
+    const {email}=dto
+
+
+    const existingUser = await this.userRepository.findOne({
+      where:{
+        email:email
+      }
+    })
+
+  if(!existingUser){
+    throw new NotFoundException("User not found")
+    }
+
+  if(existingUser.isVerified )  throw new BadRequestException("This user alredy verify")
+
+
+
+
+
+
+  
+
+
+
+
+
+  }
+
+
+
+
 }
