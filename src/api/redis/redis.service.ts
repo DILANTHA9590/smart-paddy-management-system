@@ -54,12 +54,5 @@ export class RedisService implements OnModuleInit {
     return this.redis.ttl(key);
   }
 
-
-  async verifyUserOtp(key:string){
-    const otp = this.redis.get(key);
-    if(!otp) throw new NotFoundException("This Otp Already Expired" )
-    return true  
-
-
-  }
+  
 }
