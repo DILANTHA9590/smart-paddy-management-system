@@ -19,11 +19,13 @@ export class OtpService {
   ) {}
   async create(email: string): Promise<ApiResponseDto<null>> {
     const otp = this.genarateOtp();
-    const existingValue = await this.rediseService.getRedis(email);
+    const key = `otp:${email}`;
+    const existingValue = await this.rediseService.getRedis(key);
     if (existingValue)
       throw new ConflictException('We Are Already Send Otp Your Email');
+
     try {
-      await this.rediseService.setRedis(email, otp);
+      await this.rediseService.setRedis(key, otp); //
       await this.emailService.sendOtp(email, otp);
       return {
         success: true,
@@ -42,37 +44,33 @@ export class OtpService {
   }
 
   async resendOtp(email: string) {
+    const key = `otp:${email}`;
+    const ttl = await this.rediseService.getTTL(key);
+    if (ttl > 0) {
+      throw new BadRequestException(
+        `Please wait ${ttl} seconds before requesting a new OTP`,
+      );
+    }
+
+    const otp = this.genarateOtp();
+
     try {
-      const ttl = await this.rediseService.getTTL(email);
-      if (ttl > 0) {
-        throw new BadRequestException(
-          `Please wait ${ttl} seconds before requesting a new OTP`,
-        );
-      }
-
-      const otp = this.genarateOtp();
-
       await this.emailService.sendOtp(email, otp);
-      await this.rediseService.setRedis(email, otp);
-    } catch (err) {
+    } catch (error) {
       throw new InternalServerErrorException('Failed to send OTP email');
     }
+    await this.rediseService.setRedis(key, otp);
   }
 
-  async validateOtp(email:string,otp:string){
+  async validateOtp(email: string, otp: string) {
+    const key = `otp:${email}`;
+    const existingOtp = await this.rediseService.getRedis(key);
+    if (!existingOtp) throw new NotFoundException('OTP expired or not found');
 
-    const existingOtp = await this.rediseService.getRedis(email)
-    if(!existingOtp) throw new NotFoundException("Otp Already Expired")
-    
-      
-    if(otp !== existingOtp){
-      throw new  BadRequestException("Please insert correct otp")
-    } 
-    
-    
-    return true
+    if (otp !== existingOtp) {
+      throw new BadRequestException('Please enter the correct OTP');
+    }
 
-    
-
+    await this.rediseService.deleteRedis(key);
   }
 }
