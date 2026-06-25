@@ -25,6 +25,7 @@ import { AssignUserRoleDto } from './dto/assign-user_role.dto';
 import { RedisService } from '../redis/redis.service';
 import { OtpService } from '../otp/otp.service';
 import { ResendOtpDto } from './dto/resend-otp.dto';
+import { VerifyOtpDto } from './dto/verify-otp.dto';
 
 @Injectable()
 export class UserService {
@@ -84,6 +85,9 @@ export class UserService {
   private generateFiveDigitNumber(): number {
     return Math.floor(100 + Math.random() * 900);
   }
+
+
+
 
   async resendOtp(dto: ResendOtpDto): Promise<ApiResponseDto<null>> {
     const { email } = dto;
@@ -263,39 +267,35 @@ OR user.email LIKE :search`,
     };
   }
 
-
-  
-  async verifyUserOtp(dto:ResendOtpDto){
-
-    const {email}=dto
-
+  async verifyUserOtp(dto: VerifyOtpDto):Promise<ApiResponseDto<null>> {
+    const { email ,otp } = dto;
 
     const existingUser = await this.userRepository.findOne({
-      where:{
-        email:email
-      }
-    })
+      where: {
+        email: email
+      },
+    });
 
-  if(!existingUser){
-    throw new NotFoundException("User not found")
+    if (!existingUser) {
+      throw new NotFoundException('User not found');
     }
 
-  if(existingUser.isVerified )  throw new BadRequestException("This user alredy verify")
+    if (existingUser.isVerified) throw new BadRequestException('This user alredy verify');
 
+     await this.otpService.validateOtp(email,otp)
+     await this.userRepository.save({
+      ...existingUser,isVerified:true
+     })
 
-
-
-
-
+     
+       return {
+      success: true,
+      message: 'Role assigned successfully',
+       data: null
+    }
+     }
+  }
+   
   
 
 
-
-
-
-  }
-
-
-
-
-}
