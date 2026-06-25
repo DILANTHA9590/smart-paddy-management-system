@@ -36,9 +36,9 @@ export class AuthService {
 
     if (!existingUser) throw new NotFoundException('Inavlid username or email');
 
-    //   if (!existingUser.isVerified) {
-    //   throw new ForbiddenException('Please verify your email first');
-    // }
+      if (!existingUser.isVerified) {
+      throw new ForbiddenException('Please verify your email first');
+    }
 
     if (existingUser.userStatus === USER_STATUS.BLOCKED) {
       throw new ForbiddenException(
