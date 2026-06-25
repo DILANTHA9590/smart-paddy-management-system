@@ -56,10 +56,10 @@ export class UserController {
     return this.userService.create(createUserDto);
   }
 
-  @Post('resend/otp')
+  @Post('resend-otp')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
-    summary: 'Generate OTP',
+    summary: 'Resend otp',
     description:
       'This endpoint is used to generate and send an OTP to the provided email address.',
   })

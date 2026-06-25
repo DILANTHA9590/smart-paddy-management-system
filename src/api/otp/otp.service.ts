@@ -44,6 +44,7 @@ export class OtpService {
   }
 
   async resendOtp(email: string) {
+
     const key = `otp:${email}`;
     const ttl = await this.rediseService.getTTL(key);
     if (ttl > 0) {
@@ -66,7 +67,6 @@ export class OtpService {
     const key = `otp:${email}`;
     const existingOtp = await this.rediseService.getRedis(key);
     if (!existingOtp) throw new NotFoundException('OTP expired or not found');
-
     if (otp !== existingOtp) {
       throw new BadRequestException('Please enter the correct OTP');
     }
