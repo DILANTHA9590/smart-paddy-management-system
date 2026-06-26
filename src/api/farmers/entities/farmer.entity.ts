@@ -1,3 +1,4 @@
+import { FarmersAssociationMember } from 'src/api/farmer-association/entities/farmers-association-member.entity';
 import { User } from '../../user/entities/user.entity';
 
 import {
@@ -9,6 +10,7 @@ import {
   ManyToOne,
   JoinColumn,
   OneToOne,
+  OneToMany,
 } from 'typeorm';
 
 @Entity('farmers')
@@ -52,8 +54,8 @@ export class Farmer {
   @Column({ nullable: true })
   profile_image?: string;
 
-  @Column({ nullable: true })
-  organization_id?: number;
+  // @Column({ nullable: true })
+  // organization_id?: number;
 
   //   @ManyToOne(
   //     () => Organization,
@@ -65,6 +67,13 @@ export class Farmer {
   //   )
   //   @JoinColumn({ name: "organization_id" })
   //   organization: Organization;
+
+
+@OneToMany(
+  () => FarmersAssociationMember,
+  (member) => member.farmer,
+)
+associationMemberships?: FarmersAssociationMember[];
 
   @CreateDateColumn()
   created_at!: Date;
