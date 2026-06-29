@@ -20,6 +20,16 @@ export class FarmersAssociationMember {
   id!: string;
 
 
+//   @Column({
+//     type: 'enum',
+//     enum: FarmersAssociationMemberStatus,
+//     default: FarmersAssociationMemberStatus.ACTIVE,
+//   })
+//   status: FarmersAssociationMemberStatus;
+
+
+
+//farmer association and  farmer association member realtionship
 @ManyToOne(
   () => Farmer,
   (farmer) => farmer.associationMemberships,
@@ -30,6 +40,7 @@ export class FarmersAssociationMember {
 @JoinColumn({ name: 'farmerId'})
 farmer?: Farmer;
 
+//farmer association and  farmer association member realtionship
 @ManyToOne(
   () => FarmersAssociation,
   (association) => association.members,
@@ -39,15 +50,6 @@ farmer?: Farmer;
 )
 @JoinColumn({ name: 'associationId' })
 association?: FarmersAssociation;
-
-
-
-//   @Column({
-//     type: 'enum',
-//     enum: FarmersAssociationMemberStatus,
-//     default: FarmersAssociationMemberStatus.ACTIVE,
-//   })
-//   status: FarmersAssociationMemberStatus;
 
   @Column({
     type: 'timestamp',

@@ -7,6 +7,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { FarmersAssociationMember } from './farmers-association-member.entity';
+import { FarmersAssociationNotice } from './farmers-association-notice.entity';
 // import { FarmersAssociationMember } from './farmers-association-member.entity';
 // import { FarmersAssociationNotice } from './farmers-association-notice.entity';
 
@@ -21,13 +22,6 @@ export class FarmersAssociation {
   @Column({ nullable: true })
   district!: string;
 
-@OneToMany(
-  () => FarmersAssociationMember,
-  (member) => member.association,
-)
-members?: FarmersAssociationMember[];
-
-  
   @Column()
   createdBy!:string;
 
@@ -40,4 +34,19 @@ members?: FarmersAssociationMember[];
 
   @UpdateDateColumn()
   updatedAt!: Date;
+
+
+  //   farmer association and  assocation notice realtionship (one to many relationship)
+@OneToMany(
+  () => FarmersAssociationNotice,
+  (notice) => notice.association,
+)
+notices!: FarmersAssociationNotice[];
+
+//   farmer association and  farmer association member realtionship(One to many relationship)
+@OneToMany(
+  () => FarmersAssociationMember,
+  (member) => member.association,
+)
+members?: FarmersAssociationMember[];
 }
