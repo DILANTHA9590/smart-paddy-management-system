@@ -9,6 +9,7 @@ import { FarmersModule } from './api/farmers/farmers.module';
 import { OtpModule } from './api/otp/otp.module';
 import { RedisModule } from './api/redis/redis.module';
 import { EmailModule } from './api/email/email.module';
+import { FarmerAssociationModule } from './api/farmer-association/farmer-association.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { EmailModule } from './api/email/email.module';
     OtpModule,
     RedisModule,
     EmailModule,
+    FarmerAssociationModule,
   ],
 })
 export class AppModule {}
