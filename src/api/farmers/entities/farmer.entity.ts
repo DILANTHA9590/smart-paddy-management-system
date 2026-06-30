@@ -55,11 +55,18 @@ export class Farmer {
   })
   gender!: Gender;
 
+  @Column({ nullable: true })
+  createdBy?: string;
+
+  @Column({ nullable: true })
+  updatedBy?: string;
+
   @CreateDateColumn()
   createdAt!: Date;
 
   @UpdateDateColumn()
   updatedAt!: Date;
+
 
   //farmer and association member realtionship(one to many relationship)
   @OneToMany(
