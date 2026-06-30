@@ -184,7 +184,23 @@ async update(
   };
 }
 
+async remove(id: string): Promise<ApiResponseDto<null>> {
+  const farmer = await this.farmerRepository.findOne({
+    where: { id },
+  });
 
+  if (!farmer) {
+    throw new NotFoundException('Farmer not found');
+  }
+
+  await this.farmerRepository.remove(farmer);
+
+  return {
+    success: true,
+    message: 'Farmer deleted successfully',
+    data: null,
+  };
+}
 
 
 }
