@@ -10,6 +10,7 @@ import { UserRole } from '../roles/role.enum';
 import { ApiResponseDto } from 'src/common/dto/api-respose-dto';
 import { SearchFarmerDto } from './dto/search-farmer.dto';
 import { PaginatedDto } from 'src/common/dto/paginated.dto';
+import { JwtPayloadDto } from '../auth/dto/jwtPayload';
 
 @Injectable()
 export class FarmersService {
@@ -130,16 +131,60 @@ const farmer = this.farmerRepository.create({
     },
   };
 }
+async findOne(id: string): Promise<ApiResponseDto<Farmer>> {
+  const farmer = await this.farmerRepository.findOne({
+    where: { id },
+    relations: {
+      user: true,
+    },
+  });
 
-  findOne(id: number) {
-    return `This action returns a #${id} farmer`;
+  if (!farmer) {
+    throw new NotFoundException('Farmer not found');
   }
 
-  update(id: number, updateFarmerDto: UpdateFarmerDto) {
-    return `This action updates a #${id} farmer`;
+  return {
+    success: true,
+    message: 'Farmer retrieved successfully',
+    data: farmer,
+  };
+}
+
+async update(
+  id: string,
+  dto: UpdateFarmerDto,
+  user:JwtPayloadDto,
+
+): Promise<ApiResponseDto<Farmer>> {
+  const farmer = await this.farmerRepository.findOne({
+    where: { id },
+  });
+
+  if (!farmer) {
+    throw new NotFoundException('Farmer not found');
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} farmer`;
-  }
+  await this.farmerRepository.save({
+    ...farmer,
+    ...dto,
+    updatedAt:user.sub
+  });
+
+  const updatedFarmer = await this.farmerRepository.findOne({
+    where: { id },
+    relations: {
+      user: true,
+    },
+  });
+
+  return {
+    success: true,
+    message: 'Farmer updated successfully',
+    data: updatedFarmer!,
+  };
+}
+
+
+
+
 }
