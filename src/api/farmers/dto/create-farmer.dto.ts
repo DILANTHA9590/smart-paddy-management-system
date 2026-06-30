@@ -1,56 +1,79 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
-  IsDate,
+  IsDateString,
   IsEnum,
   IsNotEmpty,
-  IsOptional,
   IsPhoneNumber,
   IsString,
+  Length,
 } from 'class-validator';
-import { Type } from 'class-transformer';
-import { PrimaryGeneratedColumn } from 'typeorm';
-import { Gender } from '../gender.enum';
+
+export enum Gender {
+  MALE = 'Male',
+  FEMALE = 'Female',
+  OTHER = 'Other',
+}
 
 export class CreateFarmerDto {
-  @PrimaryGeneratedColumn()
-  @IsOptional()
-  @IsString()
-  id!: string;
-
-  @IsString()
+  @ApiProperty({
+    example: 1,
+    description: 'User ID',
+  })
   @IsNotEmpty()
+  userId!: number;
+
+  @ApiProperty({
+    example: '200012345678',
+    description: 'National Identity Card Number',
+  })
+  @IsString()
+  @Length(10, 12)
   nic!: string;
 
-  @IsString()
-  @IsNotEmpty()
-  phone_number!: string;
+  @ApiProperty({
+    example: '+94771234567',
+    description: 'Farmer phone number',
+  })
+  @IsPhoneNumber()
+  phoneNumber!: string;
 
+  @ApiProperty({
+    example: 'No. 25, Main Street',
+    description: 'Residential address',
+  })
   @IsString()
   @IsNotEmpty()
   address!: string;
 
+  @ApiProperty({
+    example: 'Kandy',
+  })
   @IsString()
-  @IsNotEmpty()
   district!: string;
 
+  @ApiProperty({
+    example: 'Central',
+  })
   @IsString()
-  @IsNotEmpty()
   province!: string;
 
+  @ApiProperty({
+    example: 'Galagedara',
+  })
   @IsString()
-  @IsNotEmpty()
   village!: string;
 
-  @Type(() => Date)
-  @IsDate()
-  date_of_birth!: Date;
+  @ApiProperty({
+    example: '2000-05-20',
+    description: 'Date of birth',
+  })
+  @IsDateString()
+  dateOfBirth!: Date;
 
+  @ApiProperty({
+    enum: Gender,
+    example: Gender.MALE,
+  })
   @IsEnum(Gender)
   gender!: Gender;
-
-  @IsOptional()
-  @IsString()
-  profile_image?: string;
-
-  @IsOptional()
-  organization_id?: number;
 }
