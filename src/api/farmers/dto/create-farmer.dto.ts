@@ -5,6 +5,7 @@ import {
   IsNotEmpty,
   IsPhoneNumber,
   IsString,
+  IsUUID,
   Length,
 } from 'class-validator';
 
@@ -20,7 +21,8 @@ export class CreateFarmerDto {
     description: 'User ID',
   })
   @IsNotEmpty()
-  userId!: number;
+  @IsUUID()
+  userId!: string;
 
   @ApiProperty({
     example: '200012345678',

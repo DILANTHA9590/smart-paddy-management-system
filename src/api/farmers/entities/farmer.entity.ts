@@ -11,7 +11,9 @@ import {
   JoinColumn,
   OneToOne,
   OneToMany,
+  Index,
 } from 'typeorm';
+import { UUID } from 'typeorm/driver/mongodb/bson.typings.js';
 
 
 export enum Gender {
@@ -21,24 +23,26 @@ export enum Gender {
 }
 @Entity('farmers')
 export class Farmer {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('uuid')
   id!: string;
 
+  @Index()
   @Column({ unique: true })
   nic!: string;
 
-  @Column()
+  @Index()
+  @Column({ unique: true })
   phoneNumber!: string;
 
   @Column('text')
   address!: string;
-
+@Index()
   @Column()
   district!: string;
-
+@Index()
   @Column()
   province!: string;
-
+@Index()
   @Column()
   village!: string;
 
