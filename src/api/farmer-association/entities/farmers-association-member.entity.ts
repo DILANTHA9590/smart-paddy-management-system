@@ -19,16 +19,6 @@ export class FarmersAssociationMember {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-
-//   @Column({
-//     type: 'enum',
-//     enum: FarmersAssociationMemberStatus,
-//     default: FarmersAssociationMemberStatus.ACTIVE,
-//   })
-//   status: FarmersAssociationMemberStatus;
-
-
-
 //farmer association and  farmer association member realtionship
 @ManyToOne(
   () => Farmer,
