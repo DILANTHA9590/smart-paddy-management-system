@@ -13,22 +13,22 @@ import {
   OneToMany,
 } from 'typeorm';
 
+
+export enum Gender {
+  MALE = 'Male',
+  FEMALE = 'Female',
+  OTHER = 'Other',
+}
 @Entity('farmers')
 export class Farmer {
   @PrimaryGeneratedColumn()
   id!: string;
 
-  @OneToOne(() => User, (user) => user.farmer, {
-    onDelete: 'CASCADE',
-  })
-  @JoinColumn({ name: 'user_id' })
-  user!: User;
-
   @Column({ unique: true })
   nic!: string;
 
   @Column()
-  phone_number!: string;
+  phoneNumber!: string;
 
   @Column('text')
   address!: string;
@@ -43,41 +43,31 @@ export class Farmer {
   village!: string;
 
   @Column({ type: 'date' })
-  date_of_birth!: Date;
+  dateOfBirth!: Date;
 
   @Column({
     type: 'enum',
-    enum: ['Male', 'Female', 'Other'],
+    enum: Gender
   })
-  gender!: string;
+  gender!: Gender;
 
-  @Column({ nullable: true })
-  profile_image?: string;
+  @CreateDateColumn()
+  createdAt!: Date;
 
-  // @Column({ nullable: true })
-  // organization_id?: number;
+  @UpdateDateColumn()
+  updatedAt!: Date;
 
-  //   @ManyToOne(
-  //     () => Organization,
-  //     (organization) => organization.farmers,
-  //     {
-  //       nullable: true,
-  //       onDelete: "SET NULL",
-  //     }
-  //   )
-  //   @JoinColumn({ name: "organization_id" })
-  //   organization: Organization;
-
-
-@OneToMany(
+  //farmer and association member realtionship(one to many relationship)
+  @OneToMany(
   () => FarmersAssociationMember,
   (member) => member.farmer,
 )
 associationMemberships?: FarmersAssociationMember[];
 
-  @CreateDateColumn()
-  created_at!: Date;
-
-  @UpdateDateColumn()
-  updated_at!: Date;
+//farmer and user realtionship(one to one relationship)
+  @OneToOne(() => User, (user) => user.farmer, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'user_id' })
+  user!: User;
 }
