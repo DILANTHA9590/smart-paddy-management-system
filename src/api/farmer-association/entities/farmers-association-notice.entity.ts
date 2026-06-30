@@ -21,6 +21,9 @@ export class FarmersAssociationNotice {
   @Column({ type: 'text' })
   description!: string;
 
+  @Column({ nullable: true })
+  image?: string;
+
 
   @Column({ type: 'timestamp', nullable: true })
   displayStartDate?: Date;
