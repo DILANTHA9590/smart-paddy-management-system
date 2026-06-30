@@ -8,6 +8,8 @@ import { Farmer } from './entities/farmer.entity';
 import { Role } from '../roles/entities/role.entity';
 import { UserRole } from '../roles/role.enum';
 import { ApiResponseDto } from 'src/common/dto/api-respose-dto';
+import { SearchFarmerDto } from './dto/search-farmer.dto';
+import { PaginatedDto } from 'src/common/dto/paginated.dto';
 
 @Injectable()
 export class FarmersService {
@@ -17,7 +19,7 @@ export class FarmersService {
 @InjectRepository(Role) private readonly RoleRepository: Repository<Role>,
       
     ) {}
-  async create(dto: CreateFarmerDto):Promise<ApiResponseDto<null>> {
+  async create(dto: CreateFarmerDto ,id:string):Promise<ApiResponseDto<null>> {
 
     const { userId} = dto
 
@@ -42,11 +44,11 @@ export class FarmersService {
 }
 const farmer = this.farmerRepository.create({
       ...dto,
+      createdBy:id,
       user:{id:userId} as User  
     });
     await this.userRepository.save(farmer);
-    await this.userRepository.save({...user,role:{id:role.id}}
-    ) 
+    await this.userRepository.save({...user,role:{id:role.id}}) 
 
 
     return {
@@ -56,9 +58,78 @@ const farmer = this.farmerRepository.create({
     };
   }
 
-  findAll() {
-    return `This action returns all farmers`;
+ async findAll(
+  dto: SearchFarmerDto,
+): Promise<ApiResponseDto<PaginatedDto<Farmer>>> {
+  const { search, province, district, village, gender, page, limit } = dto;
+
+  const query = this.farmerRepository
+    .createQueryBuilder('farmer')
+    .leftJoinAndSelect('farmer.user', 'user')
+    .select([
+        'user.id',
+        'user.firstName',
+        'user.lastName',
+        'user.email',
+        'user.userName',
+        'user.isVerified',
+        'user.userStatus',
+        'role.id',
+        'role.roleName',
+      ]);
+
+
+  if (search) {
+    query.andWhere(
+      `(farmer.phoneNumber LIKE :search
+        OR farmer.nic LIKE :search)`,
+      {
+        search: `%${search}%`,
+      },
+    );
   }
+
+  if (province) {
+    query.andWhere('farmer.province = :province', {
+      province,
+    });
+  }
+
+  if (district) {
+    query.andWhere('farmer.district = :district', {
+      district,
+    });
+  }
+
+  if (village) {
+    query.andWhere('farmer.village = :village', {
+      village,
+    });
+  }
+
+  if (gender) {
+    query.andWhere('farmer.gender = :gender', {
+      gender,
+    });
+  }
+
+  query.take(limit);
+  query.skip((page - 1) * limit);
+
+  const [farmers, total] = await query.getManyAndCount();
+
+  const totalPages = Math.ceil(total / limit);
+
+  return {
+    success: true,
+    message: 'Farmers retrieved successfully',
+    data: {
+      items: farmers,
+      totalPages,
+      limit,
+    },
+  };
+}
 
   findOne(id: number) {
     return `This action returns a #${id} farmer`;
