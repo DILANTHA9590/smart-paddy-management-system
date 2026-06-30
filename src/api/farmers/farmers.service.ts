@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { Farmer } from './entities/farmer.entity';
 import { Role } from '../roles/entities/role.entity';
 import { UserRole } from '../roles/role.enum';
+import { ApiResponseDto } from 'src/common/dto/api-respose-dto';
 
 @Injectable()
 export class FarmersService {
@@ -16,7 +17,7 @@ export class FarmersService {
 @InjectRepository(Role) private readonly RoleRepository: Repository<Role>,
       
     ) {}
-  async create(dto: CreateFarmerDto) {
+  async create(dto: CreateFarmerDto):Promise<ApiResponseDto<null>> {
 
     const { userId} = dto
 
@@ -46,6 +47,13 @@ const farmer = this.farmerRepository.create({
     await this.userRepository.save(farmer);
     await this.userRepository.save({...user,role:{id:role.id}}
     ) 
+
+
+    return {
+      success: true,
+      message: 'User created successfully',
+      data: null,
+    };
   }
 
   findAll() {
