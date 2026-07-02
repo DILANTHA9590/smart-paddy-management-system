@@ -19,7 +19,7 @@ export class FarmersAssociationMember {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-//farmer association and  farmer association member realtionship
+//farmer  and  farmer association member realtionship
 @ManyToOne(
   () => Farmer,
   (farmer) => farmer.associationMemberships,
