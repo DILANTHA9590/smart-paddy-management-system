@@ -64,20 +64,19 @@ const farmer = this.farmerRepository.create({
 ): Promise<ApiResponseDto<PaginatedDto<Farmer>>> {
   const { search, province, district, village, gender, page, limit } = dto;
 
-  const query = this.farmerRepository
-    .createQueryBuilder('farmer')
-    .leftJoinAndSelect('farmer.user', 'user')
-    .select([
-        'user.id',
-        'user.firstName',
-        'user.lastName',
-        'user.email',
-        'user.userName',
-        'user.isVerified',
-        'user.userStatus',
-        'role.id',
-        'role.roleName',
-      ]);
+  const query = this.farmerRepository.createQueryBuilder('farmer').
+  select(
+    [
+  'farmer.id',
+  'farmer.nic',
+  'farmer.phoneNumber',
+  'farmer.district',
+  'farmer.province',
+  'farmer.village',
+  'farmer.gender',
+  'farmer.createdAt',
+    ]
+  )
 
 
   if (search) {
@@ -132,12 +131,35 @@ const farmer = this.farmerRepository.create({
   };
 }
 async findOne(id: string): Promise<ApiResponseDto<Farmer>> {
-  const farmer = await this.farmerRepository.findOne({
-    where: { id },
-    relations: {
-      user: true,
-    },
-  });
+ const farmer = await this.farmerRepository.createQueryBuilder('farmer')
+ .leftJoinAndSelect('farmer.user', 'user')
+    .select([
+       // Farmer
+    'farmer.id',
+    'farmer.nic',
+    'farmer.phoneNumber',
+    'farmer.address',
+    'farmer.district',
+    'farmer.province',
+    'farmer.village',
+    'farmer.dateOfBirth',
+    'farmer.gender',
+    'farmer.createdAt',
+
+
+      // user 
+        'user.id',
+        'user.firstName',
+        'user.lastName',
+        'user.email',
+        'user.userName',
+        'user.isVerified',
+        'user.userStatus',
+      ])
+    .where('farmer.id = :id', { id })
+      .getOne()
+
+ 
 
   if (!farmer) {
     throw new NotFoundException('Farmer not found');
@@ -202,5 +224,12 @@ async remove(id: string): Promise<ApiResponseDto<null>> {
   };
 }
 
+  async generatePdfReport() {}
 
+  async generateCsvReport() {}
+
+  async generateExcelReport() {}
 }
+
+
+
