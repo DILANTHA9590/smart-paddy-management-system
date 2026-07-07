@@ -5,6 +5,7 @@ import {
   OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
+  Index,
 } from 'typeorm';
 import { FarmersAssociationMember } from './farmers-association-member.entity';
 import { FarmersAssociationNotice } from './farmers-association-notice.entity';
@@ -16,11 +17,22 @@ export class FarmersAssociation {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
+    @Column({
+  unique: true,
+  length: 20,
+})
+associationCode!: string;
+  
+
   @Column({ unique: true, length: 150 })
   name!: string;
 
-  @Column({ nullable: true })
+
+  @Column()
   district!: string;
+
+    @Column()
+  village!: string;
 
   @Column()
   createdBy!:string;
@@ -32,6 +44,7 @@ export class FarmersAssociation {
   @CreateDateColumn()
   createdAt!: Date;
 
+  @Index()
   @UpdateDateColumn()
   updatedAt!: Date;
 
