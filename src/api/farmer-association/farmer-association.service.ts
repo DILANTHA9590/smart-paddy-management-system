@@ -127,7 +127,27 @@ async remove(id: string): Promise<ApiResponseDto<null>> {
  async  findAll(dto:SearchFarmersAssociationDto , user:JwtPayloadDto) {
 
 const{search,district,village,province,limit,page} = dto
+// 🔹 Role filter එක මුලින්
+// switch (user.role) {
+//   case Role.ADMIN:
+//     break;
 
+//   case Role.FARMER:
+//     query
+//       .innerJoin('association.members', 'member')
+//       .andWhere('member.farmerId = :farmerId', {
+//         farmerId: user.farmerId,
+//       });
+//     break;
+
+//   case Role.AGRICULTURE_ADVISOR:
+//     query
+//       .innerJoin('association.members', 'member')
+//       .andWhere('member.associationId = :associationId', {
+//         associationId: user.associationId,
+//       });
+//     break;
+// }
 
 
   const query =  this.famerAssociationRepository.createQueryBuilder('association')
