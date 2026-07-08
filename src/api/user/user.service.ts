@@ -117,7 +117,7 @@ export class UserService {
   async getAllUsers(
     dto: SearchUsersDto,
   ): Promise<ApiResponseDto<PaginatedDto<User>>> {
-    const { limit, search, page, status } = dto;
+    const { limit=10, search, page=1, status } = dto;
 
     const query = this.userRepository
       .createQueryBuilder('user')
@@ -156,7 +156,7 @@ OR user.email LIKE :search`,
 
     return {
       success: true,
-      message: 'User created successfully',
+      message: 'Users fetched successfully',
       data: {
         items: user,
         totalPages,
