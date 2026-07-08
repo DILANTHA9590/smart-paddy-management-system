@@ -31,6 +31,10 @@ associationCode!: string;
   @Column()
   district!: string;
 
+
+   @Column()
+  province!: string;
+
     @Column()
   village!: string;
 
