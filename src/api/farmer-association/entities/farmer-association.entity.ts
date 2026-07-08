@@ -7,8 +7,11 @@ import {
   UpdateDateColumn,
   Index,
 } from 'typeorm';
-import { FarmersAssociationMember } from './farmers-association-member.entity';
+import { Farmer } from '../../farmers/entities/farmer.entity'; 
 import { FarmersAssociationNotice } from './farmers-association-notice.entity';
+import { FarmersAssociationMember } from './farmers-association-member.entity';
+
+
 // import { FarmersAssociationMember } from './farmers-association-member.entity';
 // import { FarmersAssociationNotice } from './farmers-association-notice.entity';
 

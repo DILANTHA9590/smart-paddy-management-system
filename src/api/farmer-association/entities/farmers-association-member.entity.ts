@@ -9,7 +9,7 @@ import {
   Unique,
 } from 'typeorm';
 import { FarmersAssociation } from './farmer-association.entity';
-import { Farmer } from 'src/api/farmers/entities/farmer.entity';
+import { Farmer } from '../../farmers/entities/farmer.entity';
 
 
 @Entity('farmers_association_members')

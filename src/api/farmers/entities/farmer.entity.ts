@@ -1,4 +1,4 @@
-import { FarmersAssociationMember } from 'src/api/farmer-association/entities/farmers-association-member.entity';
+import { FarmersAssociationMember } from '../../farmer-association/entities/farmers-association-member.entity';
 import { User } from '../../user/entities/user.entity';
 
 import {
