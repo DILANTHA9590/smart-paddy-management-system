@@ -7,6 +7,9 @@ import { Farmer } from '../farmers/entities/farmer.entity';
 import { CreateFarmersAssociationDto } from './dto/create-farmer-association.dto';
 import { JwtPayloadDto } from '../auth/dto/jwtPayload';
 import { ApiResponseDto } from 'src/common/dto/api-respose-dto';
+import { SearchFarmersAssociationDto } from './dto/search-farmer-association.dto';
+import { SearchFarmerDto } from '../farmers/dto/search-farmer.dto';
+import { QueryResult } from 'typeorm/browser';
 
 @Injectable()
 export class FarmerAssociationService {
@@ -121,8 +124,60 @@ async remove(id: string): Promise<ApiResponseDto<null>> {
 
  
 
-  findAll() {
-    return `This action returns all farmerAssociation`;
+ async  findAll(dto:SearchFarmersAssociationDto , user:JwtPayloadDto) {
+
+const{search,district,village,province,limit,page} = dto
+
+
+
+  const query =  this.famerAssociationRepository.createQueryBuilder('association')
+
+  if(search){
+  query.where('association.name LIKE :search OR association,associationCode LIKE :search',{
+    search:search
+  })
+  }
+
+  if(province){
+   query.andWhere('association.province LIKE :search',{search:`%${search}%`})
+  }
+
+
+    if(district){
+   query.andWhere('association.district LIKE :search',{search:`%${search}%`})
+  }
+
+    if(province){
+   query.andWhere('association.province LIKE :search',{search:`%${search}%`})
+  }
+
+  
+    query.take(limit);
+
+    query.skip((page - 1) * limit);
+
+    const [association, total] = await query.getManyAndCount();
+
+    const totalPages = Math.ceil(total / limit);
+
+     return {
+      success: true,
+      message: 'User created successfully',
+      data: {
+        items:association,
+        totalPages,
+        limit,
+      },
+    };
+
+  
+  
+
+   
+
+
+    
+  
   }
 
   findOne(id: number) {
