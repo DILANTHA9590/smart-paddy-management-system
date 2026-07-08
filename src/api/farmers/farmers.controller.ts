@@ -15,28 +15,28 @@ import { UpdateFarmerDto } from './dto/update-farmer.dto';
 export class FarmersController {
   constructor(private readonly farmersService: FarmersService) {}
 
-  @Post()
-  create(@Body() createFarmerDto: CreateFarmerDto) {
-    return this.farmersService.create(createFarmerDto);
-  }
+  // @Post()
+  // create(@Body() createFarmerDto: CreateFarmerDto) {
+  //   return this.farmersService.create(createFarmerDto);
+  // }
 
-  @Get()
-  findAll() {
-    return this.farmersService.findAll();
-  }
+  // @Get()
+  // findAll() {
+  //   return this.farmersService.findAll();
+  // }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.farmersService.findOne(+id);
-  }
+  // @Get(':id')
+  // findOne(@Param('id') id: string) {
+  //   return this.farmersService.findOne(+id);
+  // }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateFarmerDto: UpdateFarmerDto) {
-    return this.farmersService.update(+id, updateFarmerDto);
-  }
+  // @Patch(':id')
+  // update(@Param('id') id: string, @Body() updateFarmerDto: UpdateFarmerDto) {
+  //   return this.farmersService.update(+id, updateFarmerDto);
+  // }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.farmersService.remove(+id);
-  }
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.farmersService.remove(+id);
+  // }
 }

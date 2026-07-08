@@ -4,9 +4,10 @@ import { FarmersController } from './farmers.controller';
 import { Farmer } from './entities/farmer.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../user/entities/user.entity';
+import { Role } from '../roles/entities/role.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Farmer,User])],
+  imports: [TypeOrmModule.forFeature([Farmer,User,Role])],
   controllers: [FarmersController],
   providers: [FarmersService],
 })
