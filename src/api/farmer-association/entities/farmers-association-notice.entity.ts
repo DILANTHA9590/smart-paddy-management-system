@@ -9,7 +9,6 @@ import {
 } from 'typeorm';
 import { FarmersAssociation } from './farmer-association.entity';
 
-
 @Entity('farmers_association_notices')
 export class FarmersAssociationNotice {
   @PrimaryGeneratedColumn('uuid')
@@ -24,11 +23,10 @@ export class FarmersAssociationNotice {
   @Column({ nullable: true })
   image?: string;
 
-
   @Column({ type: 'timestamp', nullable: true })
   displayStartDate?: Date;
 
-  @Column({ type: 'timestamp', nullable: true ,})
+  @Column({ type: 'timestamp', nullable: true })
   displayEndDate?: Date;
 
   @Column({ default: true })
@@ -40,13 +38,9 @@ export class FarmersAssociationNotice {
   @UpdateDateColumn()
   updatedAt!: Date;
   //   farmer association and  assocation notice realtionship
-  @ManyToOne(
-    () => FarmersAssociation,
-    (association) => association.notices,
-    {
-      onDelete: 'CASCADE',
-    },
-  )
+  @ManyToOne(() => FarmersAssociation, (association) => association.notices, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'associationId' })
   association!: FarmersAssociation;
 }

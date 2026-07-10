@@ -44,7 +44,6 @@ export class OtpService {
   }
 
   async resendOtp(email: string) {
-
     const key = `otp:${email}`;
     const ttl = await this.rediseService.getTTL(key);
     if (ttl > 0) {

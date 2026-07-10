@@ -147,25 +147,22 @@ export class UserController {
     return this.userService.remove(id);
   }
 
-@Post('verify-otp')
-@HttpCode(HttpStatus.OK)
-@ApiOperation({ summary: 'Verify user OTP' })
-@ApiResponse({
-  status: 200,
-  description: 'OTP verified successfully',
-})
-@ApiResponse({
-  status: 400,
-  description: 'Invalid or expired OTP / user already verified',
-})
-@ApiResponse({
-  status: 404,
-  description: 'User not found',
-})
-verifyUserOtp(
-  @Body() dto: VerifyOtpDto,
-): Promise<ApiResponseDto<null>> {
-  return this.userService.verifyUserOtp(dto);
-}
-
+  @Post('verify-otp')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Verify user OTP' })
+  @ApiResponse({
+    status: 200,
+    description: 'OTP verified successfully',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid or expired OTP / user already verified',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'User not found',
+  })
+  verifyUserOtp(@Body() dto: VerifyOtpDto): Promise<ApiResponseDto<null>> {
+    return this.userService.verifyUserOtp(dto);
+  }
 }

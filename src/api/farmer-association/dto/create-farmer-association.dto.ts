@@ -1,10 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  Length,
-} from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, Length } from 'class-validator';
 
 export class CreateFarmersAssociationDto {
   @ApiProperty({
@@ -15,9 +10,9 @@ export class CreateFarmersAssociationDto {
   @IsNotEmpty()
   @Length(3, 150)
   name!: string;
-  
-@IsString()
-@IsOptional()
+
+  @IsString()
+  @IsOptional()
   associationCode!: string;
   @ApiProperty({
     example: 'Kandy',

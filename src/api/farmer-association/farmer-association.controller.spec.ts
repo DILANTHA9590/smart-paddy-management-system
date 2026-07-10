@@ -11,7 +11,9 @@ describe('FarmerAssociationController', () => {
       providers: [FarmerAssociationService],
     }).compile();
 
-    controller = module.get<FarmerAssociationController>(FarmerAssociationController);
+    controller = module.get<FarmerAssociationController>(
+      FarmerAssociationController,
+    );
   });
 
   it('should be defined', () => {

@@ -1,11 +1,21 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { FarmerAssociationService } from './farmer-association.service';
 // import { CreateFarmerAssociationDto } from './dto/create-farmer-association.dto';
 import { UpdateFarmerAssociationDto } from './dto/update-farmer-association.dto';
 
 @Controller('farmer-association')
 export class FarmerAssociationController {
-  constructor(private readonly farmerAssociationService: FarmerAssociationService) {}
+  constructor(
+    private readonly farmerAssociationService: FarmerAssociationService,
+  ) {}
 
   // @Post()
   // create(@Body() createFarmerAssociationDto: CreateFarmerAssociationDto) {

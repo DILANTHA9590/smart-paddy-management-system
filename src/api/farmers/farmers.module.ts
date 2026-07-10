@@ -7,7 +7,7 @@ import { User } from '../user/entities/user.entity';
 import { Role } from '../roles/entities/role.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Farmer,User,Role])],
+  imports: [TypeOrmModule.forFeature([Farmer, User, Role])],
   controllers: [FarmersController],
   providers: [FarmersService],
 })
