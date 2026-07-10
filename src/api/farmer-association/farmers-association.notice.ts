@@ -80,7 +80,8 @@ export class FamerAssociationNoticeService {
         throw new BadRequestException('Please Enter future date Range');
       }
       if (new Date(displayStartDate) > new Date(displayEndDate)) {
-        throw new BadRequestException('Please Enter future date Range');
+        throw new BadRequestException('Start date cannot be after the end date');
+   
       }
     }
   }
