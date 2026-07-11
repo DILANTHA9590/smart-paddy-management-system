@@ -150,7 +150,7 @@ export class FarmerAssociationService {
       this.famerAssociationRepository.createQueryBuilder('association');
 
     if (search) {
-      query.where(
+      query.andWhere(
         'association.name LIKE :search OR association,associationCode LIKE :search',
         {
           search: search,
