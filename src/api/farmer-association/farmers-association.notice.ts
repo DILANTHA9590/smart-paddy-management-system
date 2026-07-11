@@ -9,6 +9,8 @@ import { Repository } from 'typeorm';
 import { CreateFarmersAssociationNoticeDto } from './dto/create-farmers-association.notice.dto';
 import { FarmersAssociation } from './entities/farmer-association.entity';
 import { ApiResponseDto } from 'src/common/dto/api-respose-dto';
+import { SearchFarmersAssociationNoticeDto } from './dto/search-farmers-association-notice.dto';
+import { JwtPayloadDto } from '../auth/dto/jwtPayload';
 
 @Injectable()
 export class FamerAssociationNoticeService {
@@ -58,7 +60,28 @@ export class FamerAssociationNoticeService {
     };
   }
 
-  async update(id: string, dto: FarmersAssociationNotice) {
+
+
+  async remove(id: string): Promise<ApiResponseDto<null>> {
+
+  const notice = await this.famerAssociationNoticeRepository.findOne({
+    where: { id },
+  });
+
+  if (!notice) {
+    throw new NotFoundException('Notice not found.');
+  }
+
+  await this.famerAssociationNoticeRepository.delete(id);
+
+  return {
+    success: true,
+    message: 'Notice deleted successfully.',
+    data: null,
+  };
+}
+
+  async update(id: string, dto: CreateFarmersAssociationNoticeDto): Promise<ApiResponseDto<null>>{
     const { displayStartDate, displayEndDate } = dto;
 
     const existing = await this.famerAssociationNoticeRepository.findOne({
@@ -84,5 +107,33 @@ export class FamerAssociationNoticeService {
    
       }
     }
+
+     
+     const newData = this.famerAssociationNoticeRepository.merge(existing,dto)
+
+    await this.famerAssociationNoticeRepository.save(newData)
+
+    return {
+    success: true,
+    message: 'Notice deleted successfully.',
+    data: null,
+  };
+
   }
+
+
+
+ async  getAll(dto:SearchFarmersAssociationNoticeDto ,user:JwtPayloadDto){
+
+  const {fromDate,toDate,search,page,limit} =dto
+
+
+  const query =  this.famerAssociationNoticeRepository.createQueryBuilder('notice')
+ 
+
+  
+
+
+  }
+
 }
