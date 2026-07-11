@@ -1,6 +1,14 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsEnum, IsInt, IsOptional, IsString, IsUUID, Max, Min } from 'class-validator';
+import {
+  IsEnum,
+  IsInt,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Max,
+  Min,
+} from 'class-validator';
 import { Gender } from '../gender.enum';
 
 export class SearchFarmerDto {
@@ -16,7 +24,6 @@ export class SearchFarmerDto {
     description: 'Search by NIC',
     example: '200012345678',
   })
- 
   @ApiPropertyOptional({
     description: 'Search by district',
     example: 'Kandy',
@@ -53,22 +60,21 @@ export class SearchFarmerDto {
   @IsUUID()
   userId?: string;
 
-   @IsOptional()
-    @Type(() => Number)
-    @IsInt()
-    @Min(1)
-    page: number = 1;
-  
-    @ApiPropertyOptional({
-      example: 10,
-      description: 'Number of users per page',
-      default: 10,
-    })
-    @IsOptional()
-    @Type(() => Number)
-    @IsInt()
-    @Min(1)
-    @Max(100)
-    limit: number = 10;
-  
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  page: number = 1;
+
+  @ApiPropertyOptional({
+    example: 10,
+    description: 'Number of users per page',
+    default: 10,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  limit: number = 10;
 }

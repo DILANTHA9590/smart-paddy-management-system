@@ -86,9 +86,6 @@ export class UserService {
     return Math.floor(100 + Math.random() * 900);
   }
 
-
-
-
   async resendOtp(dto: ResendOtpDto): Promise<ApiResponseDto<null>> {
     const { email } = dto;
 
@@ -117,7 +114,7 @@ export class UserService {
   async getAllUsers(
     dto: SearchUsersDto,
   ): Promise<ApiResponseDto<PaginatedDto<User>>> {
-    const { limit=10, search, page=1, status } = dto;
+    const { limit = 10, search, page = 1, status } = dto;
 
     const query = this.userRepository
       .createQueryBuilder('user')
@@ -267,12 +264,12 @@ OR user.email LIKE :search`,
     };
   }
 
-  async verifyUserOtp(dto: VerifyOtpDto):Promise<ApiResponseDto<null>> {
-    const { email ,otp } = dto;
+  async verifyUserOtp(dto: VerifyOtpDto): Promise<ApiResponseDto<null>> {
+    const { email, otp } = dto;
 
     const existingUser = await this.userRepository.findOne({
       where: {
-        email: email
+        email: email,
       },
     });
 
@@ -280,22 +277,19 @@ OR user.email LIKE :search`,
       throw new NotFoundException('User not found');
     }
 
-    if (existingUser.isVerified) throw new BadRequestException('This user alredy verify');
+    if (existingUser.isVerified)
+      throw new BadRequestException('This user alredy verify');
 
-     await this.otpService.validateOtp(email,otp)
-     await this.userRepository.save({
-      ...existingUser,isVerified:true
-     })
+    await this.otpService.validateOtp(email, otp);
+    await this.userRepository.save({
+      ...existingUser,
+      isVerified: true,
+    });
 
-     
-       return {
+    return {
       success: true,
       message: 'Role assigned successfully',
-       data: null
-    }
-     }
+      data: null,
+    };
   }
-   
-  
-
-
+}

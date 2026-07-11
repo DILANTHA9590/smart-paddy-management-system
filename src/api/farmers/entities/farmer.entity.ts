@@ -15,7 +15,6 @@ import {
 } from 'typeorm';
 import { UUID } from 'typeorm/driver/mongodb/bson.typings.js';
 
-
 export enum Gender {
   MALE = 'Male',
   FEMALE = 'Female',
@@ -36,13 +35,13 @@ export class Farmer {
 
   @Column('text')
   address!: string;
-@Index()
+  @Index()
   @Column()
   district!: string;
-@Index()
+  @Index()
   @Column()
   province!: string;
-@Index()
+  @Index()
   @Column()
   village!: string;
 
@@ -51,7 +50,7 @@ export class Farmer {
 
   @Column({
     type: 'enum',
-    enum: Gender
+    enum: Gender,
   })
   gender!: Gender;
 
@@ -67,15 +66,11 @@ export class Farmer {
   @UpdateDateColumn()
   updatedAt!: Date;
 
-
   //farmer and association member realtionship(one to many relationship)
-  @OneToMany(
-  () => FarmersAssociationMember,
-  (member) => member.farmer,
-)
-associationMemberships?: FarmersAssociationMember[];
+  @OneToMany(() => FarmersAssociationMember, (member) => member.farmer)
+  associationMemberships?: FarmersAssociationMember[];
 
-//farmer and user realtionship(one to one relationship)
+  //farmer and user realtionship(one to one relationship)
   @OneToOne(() => User, (user) => user.farmer, {
     onDelete: 'CASCADE',
   })

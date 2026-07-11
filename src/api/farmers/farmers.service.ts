@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateFarmerDto } from './dto/create-farmer.dto';
 import { UpdateFarmerDto } from './dto/update-farmer.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -14,43 +18,43 @@ import { JwtPayloadDto } from '../auth/dto/jwtPayload';
 
 @Injectable()
 export class FarmersService {
-   constructor(
-@InjectRepository(User) private readonly userRepository: Repository<User>,
-@InjectRepository(Farmer) private readonly farmerRepository: Repository<Farmer>,
-@InjectRepository(Role) private readonly RoleRepository: Repository<Role>,
-      
-    ) {}
-  async create(dto: CreateFarmerDto ,id:string):Promise<ApiResponseDto<null>> {
-
-    const { userId} = dto
+  constructor(
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
+    @InjectRepository(Farmer)
+    private readonly farmerRepository: Repository<Farmer>,
+    @InjectRepository(Role) private readonly RoleRepository: Repository<Role>,
+  ) {}
+  async create(
+    dto: CreateFarmerDto,
+    id: string,
+  ): Promise<ApiResponseDto<null>> {
+    const { userId } = dto;
 
     const user = await this.userRepository.findOne({
       where: { id: userId },
-    })
+    });
 
-    if(!user){
+    if (!user) {
       throw new NotFoundException('User not found');
     }
 
-   const role = await this.RoleRepository.findOne({
-      where:{
-        roleName:UserRole.FARMER
-      }
-    })
+    const role = await this.RoleRepository.findOne({
+      where: {
+        roleName: UserRole.FARMER,
+      },
+    });
     if (!role) {
-   throw new InternalServerErrorException(
-    'Farmer role is not configured. Please contact the system administrator.',
-  );
-
-}
-const farmer = this.farmerRepository.create({
+      throw new InternalServerErrorException(
+        'Farmer role is not configured. Please contact the system administrator.',
+      );
+    }
+    const farmer = this.farmerRepository.create({
       ...dto,
-      createdBy:id,
-      user:{id:userId} as User  
+      createdBy: id,
+      user: { id: userId } as User,
     });
     await this.userRepository.save(farmer);
-    await this.userRepository.save({...user,role:{id:role.id}}) 
-
+    await this.userRepository.save({ ...user, role: { id: role.id } });
 
     return {
       success: true,
@@ -59,95 +63,93 @@ const farmer = this.farmerRepository.create({
     };
   }
 
- async findAll(
-  dto: SearchFarmerDto,
-): Promise<ApiResponseDto<PaginatedDto<Farmer>>> {
-  const { search, province, district, village, gender, page, limit } = dto;
+  async findAll(
+    dto: SearchFarmerDto,
+  ): Promise<ApiResponseDto<PaginatedDto<Farmer>>> {
+    const { search, province, district, village, gender, page, limit } = dto;
 
-  const query = this.farmerRepository.createQueryBuilder('farmer').
-  select(
-    [
-  'farmer.id',
-  'farmer.nic',
-  'farmer.phoneNumber',
-  'farmer.district',
-  'farmer.province',
-  'farmer.village',
-  'farmer.gender',
-  'farmer.createdAt',
-    ]
-  )
+    const query = this.farmerRepository
+      .createQueryBuilder('farmer')
+      .select([
+        'farmer.id',
+        'farmer.nic',
+        'farmer.phoneNumber',
+        'farmer.district',
+        'farmer.province',
+        'farmer.village',
+        'farmer.gender',
+        'farmer.createdAt',
+      ]);
 
-
-  if (search) {
-    query.andWhere(
-      `(farmer.phoneNumber LIKE :search
+    if (search) {
+      query.andWhere(
+        `(farmer.phoneNumber LIKE :search
         OR farmer.nic LIKE :search)`,
-      {
-        search: `%${search}%`,
+        {
+          search: `%${search}%`,
+        },
+      );
+    }
+
+    if (province) {
+      query.andWhere('farmer.province = :province', {
+        province,
+      });
+    }
+
+    if (district) {
+      query.andWhere('farmer.district = :district', {
+        district,
+      });
+    }
+
+    if (village) {
+      query.andWhere('farmer.village = :village', {
+        village,
+      });
+    }
+
+    if (gender) {
+      query.andWhere('farmer.gender = :gender', {
+        gender,
+      });
+    }
+
+    query.take(limit);
+    query.skip((page - 1) * limit);
+
+    const [farmers, total] = await query.getManyAndCount();
+
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      success: true,
+      message: 'Farmers retrieved successfully',
+      data: {
+        items: farmers,
+        totalPages,
+        limit,
       },
-    );
+    };
   }
+  async findOne(id: string): Promise<ApiResponseDto<Farmer>> {
+    const farmer = await this.farmerRepository
+      .createQueryBuilder('farmer')
+      .leftJoinAndSelect('farmer.user', 'user')
+      .select([
+        // Farmer
+        'farmer.id',
+        'farmer.nic',
+        'farmer.phoneNumber',
+        'farmer.address',
+        'farmer.district',
+        'farmer.province',
+        'farmer.village',
+        'farmer.dateOfBirth',
+        'farmer.gender',
+        'farmer.createdAt',
 
-  if (province) {
-    query.andWhere('farmer.province = :province', {
-      province,
-    });
-  }
-
-  if (district) {
-    query.andWhere('farmer.district = :district', {
-      district,
-    });
-  }
-
-  if (village) {
-    query.andWhere('farmer.village = :village', {
-      village,
-    });
-  }
-
-  if (gender) {
-    query.andWhere('farmer.gender = :gender', {
-      gender,
-    });
-  }
-
-  query.take(limit);
-  query.skip((page - 1) * limit);
-
-  const [farmers, total] = await query.getManyAndCount();
-
-  const totalPages = Math.ceil(total / limit);
-
-  return {
-    success: true,
-    message: 'Farmers retrieved successfully',
-    data: {
-      items: farmers,
-      totalPages,
-      limit,
-    },
-  };
-}
-async findOne(id: string): Promise<ApiResponseDto<Farmer>> {
- const farmer = await this.farmerRepository.createQueryBuilder('farmer')
- .leftJoinAndSelect('farmer.user', 'user')
-    .select([
-       // Farmer
-    'farmer.id',
-    'farmer.nic',
-    'farmer.phoneNumber',
-    'farmer.address',
-    'farmer.district',
-    'farmer.province',
-    'farmer.village',
-    'farmer.dateOfBirth',
-    'farmer.gender',
-    'farmer.createdAt',
-
-
-      // user 
+        // user
         'user.id',
         'user.firstName',
         'user.lastName',
@@ -156,73 +158,70 @@ async findOne(id: string): Promise<ApiResponseDto<Farmer>> {
         'user.isVerified',
         'user.userStatus',
       ])
-    .where('farmer.id = :id', { id })
-      .getOne()
+      .where('farmer.id = :id', { id })
+      .getOne();
 
- 
+    if (!farmer) {
+      throw new NotFoundException('Farmer not found');
+    }
 
-  if (!farmer) {
-    throw new NotFoundException('Farmer not found');
+    return {
+      success: true,
+      message: 'Farmer retrieved successfully',
+      data: farmer,
+    };
   }
 
-  return {
-    success: true,
-    message: 'Farmer retrieved successfully',
-    data: farmer,
-  };
-}
+  async update(
+    id: string,
+    dto: UpdateFarmerDto,
+    user: JwtPayloadDto,
+  ): Promise<ApiResponseDto<Farmer>> {
+    const farmer = await this.farmerRepository.findOne({
+      where: { id },
+    });
 
-async update(
-  id: string,
-  dto: UpdateFarmerDto,
-  user:JwtPayloadDto,
+    if (!farmer) {
+      throw new NotFoundException('Farmer not found');
+    }
 
-): Promise<ApiResponseDto<Farmer>> {
-  const farmer = await this.farmerRepository.findOne({
-    where: { id },
-  });
+    await this.farmerRepository.save({
+      ...farmer,
+      ...dto,
+      updatedAt: user.sub,
+    });
 
-  if (!farmer) {
-    throw new NotFoundException('Farmer not found');
+    const updatedFarmer = await this.farmerRepository.findOne({
+      where: { id },
+      relations: {
+        user: true,
+      },
+    });
+
+    return {
+      success: true,
+      message: 'Farmer updated successfully',
+      data: updatedFarmer!,
+    };
   }
 
-  await this.farmerRepository.save({
-    ...farmer,
-    ...dto,
-    updatedAt:user.sub
-  });
+  async remove(id: string): Promise<ApiResponseDto<null>> {
+    const farmer = await this.farmerRepository.findOne({
+      where: { id },
+    });
 
-  const updatedFarmer = await this.farmerRepository.findOne({
-    where: { id },
-    relations: {
-      user: true,
-    },
-  });
+    if (!farmer) {
+      throw new NotFoundException('Farmer not found');
+    }
 
-  return {
-    success: true,
-    message: 'Farmer updated successfully',
-    data: updatedFarmer!,
-  };
-}
+    await this.farmerRepository.remove(farmer);
 
-async remove(id: string): Promise<ApiResponseDto<null>> {
-  const farmer = await this.farmerRepository.findOne({
-    where: { id },
-  });
-
-  if (!farmer) {
-    throw new NotFoundException('Farmer not found');
+    return {
+      success: true,
+      message: 'Farmer deleted successfully',
+      data: null,
+    };
   }
-
-  await this.farmerRepository.remove(farmer);
-
-  return {
-    success: true,
-    message: 'Farmer deleted successfully',
-    data: null,
-  };
-}
 
   async generatePdfReport() {}
 
@@ -230,6 +229,3 @@ async remove(id: string): Promise<ApiResponseDto<null>> {
 
   async generateExcelReport() {}
 }
-
-
-
