@@ -13,6 +13,7 @@ import { FarmersAssociation } from './farmer-association.entity';
 export class FarmersAssociationNotice {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
+  
 
   @Column({ length: 200 })
   title!: string;
