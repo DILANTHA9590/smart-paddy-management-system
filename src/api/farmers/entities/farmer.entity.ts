@@ -25,11 +25,11 @@ export class Farmer {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Index()
+
   @Column({ unique: true })
   nic!: string;
 
-  @Index()
+
   @Column({ unique: true })
   phoneNumber!: string;
 
