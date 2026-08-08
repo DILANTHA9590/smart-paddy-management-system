@@ -175,3 +175,16 @@ export class CreateFarmersAssociation1783506092145 implements MigrationInterface
     );
   }
 }
+
+// const associationWithNotices = await this.farmersAssociationRepository
+//   .createQueryBuilder('association')
+//   .leftJoinAndSelect('association.notices', 'notice') // 🌟 සමිතිය හරහා notices ඔක්කොම join කරනවා
+//   .where('association.id = :id', { id: user.associationId })
+//   .getOne();
+
+
+
+//   const query = this.farmersAssociationNoticeRepository
+//   .createQueryBuilder('notice')
+//   .leftJoin('notice.association', 'association')
+//   .addSelect(['association.name']); // සමිතියේ නම විතරයි

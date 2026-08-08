@@ -11,12 +11,18 @@ import { FarmersAssociation } from './entities/farmer-association.entity';
 import { ApiResponseDto } from 'src/common/dto/api-respose-dto';
 import { SearchFarmersAssociationNoticeDto } from './dto/search-farmers-association-notice.dto';
 import { JwtPayloadDto } from '../auth/dto/jwtPayload';
+import { Farmer } from '../farmers/entities/farmer.entity';
+import { User } from '../user/entities/user.entity';
 
 @Injectable()
 export class FamerAssociationNoticeService {
   constructor(
     @InjectRepository(FarmersAssociationNotice)
     private readonly famerAssociationNoticeRepository: Repository<FarmersAssociationNotice>,
+        @InjectRepository(Farmer)
+        private readonly famerRepository: Repository<Farmer>,
+            @InjectRepository(User) private readonly userRepository: Repository<User>,
+
     // @InjectRepository(Farmer) private readonly famerRepository: Repository<Farmer>
   ) {}
   async create(dto: CreateFarmersAssociationNoticeDto, id: string) {
@@ -122,18 +128,86 @@ export class FamerAssociationNoticeService {
   }
 
 
+// async getAll(dto: SearchFarmersAssociationNoticeDto, user: JwtPayloadDto) {
+//   // 🌟 TEST: දැනට role එක token එකෙන් ගන්නවා (උඹේ test එකට අනුව)
 
- async  getAll(dto:SearchFarmersAssociationNoticeDto ,user:JwtPayloadDto){
+//    // e.g., "farmer", "admin"
+//   const { fromDate, toDate, search, page = 1, limit = 10 } = dto;
+// const role ="admin";
+//   const query = this.famerAssociationNoticeRepository
+//     .createQueryBuilder('notice')
+//     .leftJoin('notice.association', 'association')
+//     .addSelect(['association.name']);
 
-  const {fromDate,toDate,search,page,limit} =dto
+//   // 🔐 1. ADMIN නෙමෙයි නම් විතරක් සමිතිය හොයන ලොජික් එක රන් කරනවා
+//   if (role !== 'admin') {
+//     // User -> Farmer -> Association ලින්ක් එක එකපාර relations වලින් ඇදලා ගන්නවා
+//     const dbUser = await this.userRepository.findOne({
+//       where: { id: user.sub },
+//       relations: {   
+//         farmer: {
+//         associationMemberships:{
+//           association:true
+//         }
+//         },
+//       },
+//     });
+
+//     // ⚠️ වැදගත්: Farmer කෙනෙක්ට සමිතියක් ඇත්තටම link වෙලා තියෙනවද කියලා check කරනවා
+//     const {}= dbUser
+    
+
+//   //   if (!associationId) {
+//   //     throw new NotFoundException('ඔබ කිසිදු ගොවි සමිතියකට අනුයුක්ත කර නැත.');
+//   //   }
+
+//   //   // 🎯 අන්න ඒ හොයාගත්තු ID එකෙන් විතරක් notices filter කරනවා
+//   //   query.andWhere('notice.associationId = :associationId', { associationId });
+//   // }
+
+//   // 📅 2. DATE FILTER (දිනයන් අනුව සෙවීම)
+//   if (fromDate && toDate) {
+//     query.andWhere('notice.createdAt BETWEEN :fromDate AND :toDate', {
+//       fromDate,
+//       toDate,
+//     });
+//   }
+
+//   // 🔍 3. SEARCH FILTER
+//   if (search) {
+//     query.andWhere(
+//       '(notice.title LIKE :search OR notice.description LIKE :search)',
+//       { search: `%${search}%` },
+//     );
+//   }
+
+//   // 📄 4. PAGINATION
+//   query.skip((page - 1) * limit).take(limit);
+
+//   const [notices, total] = await query.getManyAndCount();
+
+//   return {
+//     success: true,
+//     data: {
+//       items: notices,
+//       totalItems: total,
+//       totalPages: Math.ceil(total / limit),
+//       page,
+//       limit,
+//     },
+//   };
+// }
+
+  
 
 
-  const query =  this.famerAssociationNoticeRepository.createQueryBuilder('notice')
+
+
  
 
   
 
 
-  }
+//   }
 
 }

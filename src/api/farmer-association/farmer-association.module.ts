@@ -7,6 +7,7 @@ import { Farmer } from '../farmers/entities/farmer.entity';
 import { FarmersAssociationNotice } from './entities/farmers-association-notice.entity';
 import { FarmersAssociationMember } from './entities/farmers-association-member.entity';
 import { FamerAssociationNoticeService } from './farmers-association.notice';
+import { User } from '../user/entities/user.entity';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { FamerAssociationNoticeService } from './farmers-association.notice';
       Farmer,
       FarmersAssociationNotice,
       FarmersAssociationMember,
+      User
     ]),
   ],
   controllers: [FarmerAssociationController],

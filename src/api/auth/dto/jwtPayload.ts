@@ -10,4 +10,6 @@ export class JwtPayloadDto {
   tokenVersion!: number;
 
   userStatus!: string;
+
+  
 }
