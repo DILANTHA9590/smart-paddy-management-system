@@ -19,7 +19,6 @@ import { JwtStrategy } from './auth/jwt.strategy';
       }),
     }),
     PassportModule,
-    JwtModule.register({}),
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],

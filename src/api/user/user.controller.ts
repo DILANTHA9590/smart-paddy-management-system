@@ -19,6 +19,7 @@ import {
   ApiResponse,
   ApiParam,
   ApiBearerAuth,
+  ApiBody,
 } from '@nestjs/swagger';
 
 import { UserService } from './user.service';
@@ -38,7 +39,7 @@ import { VerifyOtpDto } from './dto/verify-otp.dto';
 @ApiTags('Users')
 @Controller('user')
 @ApiBearerAuth()
-// @UseGuards(AuthGuard('jwt'))
+
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -104,6 +105,37 @@ export class UserController {
   }
 
   @Patch('assign_role')
+  @UseGuards(AuthGuard('jwt'))
+ @ApiBearerAuth()
+  @ApiOperation({
+  summary: 'Assign a role to a user',
+  description:
+    'Assigns the specified role to a user. The authenticated user must have permission to perform this operation.',
+})
+@ApiBody({
+  type: AssignUserRoleDto,
+  description: 'User ID and role ID required to assign the role',
+})
+@ApiResponse({
+  status: 200,
+  description: 'Role assigned successfully',
+})
+@ApiResponse({
+  status: 400,
+  description: 'Invalid user ID or role ID',
+})
+@ApiResponse({
+  status: 401,
+  description: 'Unauthorized',
+})
+@ApiResponse({
+  status: 403,
+  description: 'Forbidden. Insufficient permissions.',
+})
+@ApiResponse({
+  status: 404,
+  description: 'User or role not found',
+})
   assignUserRole(
     @Body() dto: AssignUserRoleDto,
     @Req() req: any,

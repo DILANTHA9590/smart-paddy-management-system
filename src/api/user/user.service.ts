@@ -3,6 +3,7 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
+  UseGuards,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -26,6 +27,8 @@ import { RedisService } from '../redis/redis.service';
 import { OtpService } from '../otp/otp.service';
 import { ResendOtpDto } from './dto/resend-otp.dto';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
+import { UserRole } from '../roles/entities/role.enum';
+import { AuthGuard } from '@nestjs/passport';
 
 @Injectable()
 export class UserService {
@@ -37,6 +40,7 @@ export class UserService {
   ) {}
 
   //create  new user
+
   async create(createUserDto: CreateUserDto): Promise<ApiResponseDto<null>> {
     const { email, userName, password } = createUserDto;
 
@@ -65,15 +69,33 @@ export class UserService {
       parallelism: 1,
     });
 
+    const count  = await this.userRepository.find()
+let role: Role | null = null;
+    if(count.length==0){
+          
+ role = await  this.roleRepository.findOne({
+    where:{
+      roleName:UserRole.ADMIN
+    }
+    
+  })
+      
+
+    }
+
     // 👤 Create user
     const newUser = this.userRepository.create({
       ...createUserDto,
       password: hashedPassword,
       isVerified: false, // OTP verify karanawanam false
+      role:{id:role?.id} as Role
     });
 
     await this.userRepository.save(newUser);
     await this.otpService.create(email);
+
+    
+    
 
     return {
       success: true,
