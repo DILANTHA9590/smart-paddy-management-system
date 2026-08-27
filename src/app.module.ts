@@ -12,6 +12,8 @@ import { EmailModule } from './api/email/email.module';
 import { FarmerAssociationModule } from './api/farmer-association/farmer-association.module';
 import { PaddyFieldsModule } from './api/paddy-fields/paddy-fields.module';
 import { CultivationsModule } from './api/cultivations/cultivations.module';
+import { IrrigationModule } from './api/irrigation/irrigation.module';
+import { FertilizerModule } from './api/fertilizer/fertilizer.module';
 
 @Module({
   imports: [
@@ -50,6 +52,8 @@ import { CultivationsModule } from './api/cultivations/cultivations.module';
     FarmerAssociationModule,
     PaddyFieldsModule,
     CultivationsModule,
+    IrrigationModule,
+    FertilizerModule,
   ],
 })
 export class AppModule {}

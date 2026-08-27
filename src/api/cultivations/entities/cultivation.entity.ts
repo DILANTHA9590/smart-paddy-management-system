@@ -5,9 +5,12 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
+  OneToMany,
   JoinColumn,
 } from 'typeorm';
 import { PaddyField } from '../../paddy-fields/entities/paddy-field.entity';
+import { IrrigationLog } from '../../irrigation/entities/irrigation-log.entity';
+import { FertilizerLog } from '../../fertilizer/entities/fertilizer-log.entity';
 
 export enum CultivationStatus {
   PLANNED = 'Planned',
@@ -61,6 +64,12 @@ export class Cultivation {
     default: CultivationStatus.PLANNED,
   })
   status: CultivationStatus;
+
+  @OneToMany(() => IrrigationLog, (log) => log.cultivation)
+  irrigationLogs?: IrrigationLog[];
+
+  @OneToMany(() => FertilizerLog, (log) => log.cultivation)
+  fertilizerLogs?: FertilizerLog[];
 
   @CreateDateColumn()
   createdAt: Date;
