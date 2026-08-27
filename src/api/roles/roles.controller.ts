@@ -84,6 +84,7 @@ export class RolesController {
   }
 
   @Patch(':id')
+  @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update role' })
   @ApiResponse({
@@ -94,13 +95,15 @@ export class RolesController {
     status: 404,
     description: 'Role not found',
   })
-  update(
+  update(  
     @Param('id') id: string,
     @Body() updateRoleDto: UpdateRoleDto,
     @Req() req: any,
   ): Promise<ApiResponseDto<Role>> {
+    console.log("🎉🎉🎉🎉🎉🎉🎉🎉🌟🌟🌟🌟🌟",req.sub);
     return this.rolesService.updateRole(id, updateRoleDto, req.user);
   }
+
 
   @Delete(':id')
   @HttpCode(HttpStatus.OK)

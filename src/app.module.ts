@@ -10,6 +10,8 @@ import { OtpModule } from './api/otp/otp.module';
 import { RedisModule } from './api/redis/redis.module';
 import { EmailModule } from './api/email/email.module';
 import { FarmerAssociationModule } from './api/farmer-association/farmer-association.module';
+import { PaddyFieldsModule } from './api/paddy-fields/paddy-fields.module';
+import { CultivationsModule } from './api/cultivations/cultivations.module';
 
 @Module({
   imports: [
@@ -46,6 +48,8 @@ import { FarmerAssociationModule } from './api/farmer-association/farmer-associa
     RedisModule,
     EmailModule,
     FarmerAssociationModule,
+    PaddyFieldsModule,
+    CultivationsModule,
   ],
 })
 export class AppModule {}

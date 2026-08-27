@@ -38,7 +38,7 @@ import { VerifyOtpDto } from './dto/verify-otp.dto';
 
 @ApiTags('Users')
 @Controller('user')
-@ApiBearerAuth()
+@UseGuards(AuthGuard('jwt'))
 
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -105,7 +105,6 @@ export class UserController {
   }
 
   @Patch('assign_role')
-  @UseGuards(AuthGuard('jwt'))
  @ApiBearerAuth()
   @ApiOperation({
   summary: 'Assign a role to a user',
@@ -139,8 +138,9 @@ export class UserController {
   assignUserRole(
     @Body() dto: AssignUserRoleDto,
     @Req() req: any,
-  ): Promise<ApiResponseDto<null>> {
-    return this.userService.assignUserRole(dto, req.user);
+  ) {
+    
+   console.log("run this bro 🌟🌟🌟🌟🌟🌟🌟🌟🌟",req)
   }
 
   @Patch(':id')

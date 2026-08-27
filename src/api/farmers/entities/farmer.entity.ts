@@ -1,5 +1,6 @@
 import { FarmersAssociationMember } from '../../farmer-association/entities/farmers-association-member.entity';
 import { User } from '../../user/entities/user.entity';
+import { PaddyField } from '../../paddy-fields/entities/paddy-field.entity';
 
 import {
   Entity,
@@ -76,4 +77,8 @@ export class Farmer {
   })
   @JoinColumn({ name: 'user_id' })
   user!: User;
+
+  // farmer and paddy field relationship (one to many)
+  @OneToMany(() => PaddyField, (paddyField) => paddyField.farmer)
+  paddyFields?: PaddyField[];
 }
