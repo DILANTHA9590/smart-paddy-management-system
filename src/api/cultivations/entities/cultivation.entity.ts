@@ -11,6 +11,7 @@ import {
 import { PaddyField } from '../../paddy-fields/entities/paddy-field.entity';
 import { IrrigationLog } from '../../irrigation/entities/irrigation-log.entity';
 import { FertilizerLog } from '../../fertilizer/entities/fertilizer-log.entity';
+import { DiseasePrediction } from '../../disease-prediction/entities/disease-prediction.entity';
 
 export enum CultivationStatus {
   PLANNED = 'Planned',
@@ -70,6 +71,9 @@ export class Cultivation {
 
   @OneToMany(() => FertilizerLog, (log) => log.cultivation)
   fertilizerLogs?: FertilizerLog[];
+
+  @OneToMany(() => DiseasePrediction, (prediction) => prediction.cultivation)
+  diseasePredictions?: DiseasePrediction[];
 
   @CreateDateColumn()
   createdAt: Date;

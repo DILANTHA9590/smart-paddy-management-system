@@ -14,6 +14,8 @@ import { PaddyFieldsModule } from './api/paddy-fields/paddy-fields.module';
 import { CultivationsModule } from './api/cultivations/cultivations.module';
 import { IrrigationModule } from './api/irrigation/irrigation.module';
 import { FertilizerModule } from './api/fertilizer/fertilizer.module';
+import { DiseasePredictionModule } from './api/disease-prediction/disease-prediction.module';
+import { RemindersModule } from './api/reminders/reminders.module';
 
 @Module({
   imports: [
@@ -54,6 +56,8 @@ import { FertilizerModule } from './api/fertilizer/fertilizer.module';
     CultivationsModule,
     IrrigationModule,
     FertilizerModule,
+    DiseasePredictionModule,
+    RemindersModule,
   ],
 })
 export class AppModule {}
