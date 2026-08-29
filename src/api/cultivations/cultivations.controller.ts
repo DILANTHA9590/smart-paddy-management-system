@@ -57,13 +57,14 @@ export class CultivationsController {
   update(
     @Param('id') id: string,
     @Body() updateCultivationDto: UpdateCultivationDto,
+    @Req() req: any,
   ) {
-    return this.cultivationsService.update(id, updateCultivationDto);
+    return this.cultivationsService.update(id, updateCultivationDto, req.user?.farmerId);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a cultivation record' })
-  remove(@Param('id') id: string) {
-    return this.cultivationsService.remove(id);
+  remove(@Param('id') id: string, @Req() req: any) {
+    return this.cultivationsService.remove(id, req.user?.farmerId);
   }
 }

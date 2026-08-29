@@ -1,0 +1,8 @@
+export enum NoticeCategory {
+  GENERAL = 'GENERAL',
+  CULTIVATION = 'CULTIVATION',
+  FERTILIZER = 'FERTILIZER',
+  SUBSIDY = 'SUBSIDY',
+  WARNING = 'WARNING',
+  OTHER = 'OTHER',
+}

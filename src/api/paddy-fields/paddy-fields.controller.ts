@@ -53,13 +53,14 @@ export class PaddyFieldsController {
   update(
     @Param('id') id: string,
     @Body() updatePaddyFieldDto: UpdatePaddyFieldDto,
+    @Req() req: any,
   ) {
-    return this.paddyFieldsService.update(id, updatePaddyFieldDto);
+    return this.paddyFieldsService.update(id, updatePaddyFieldDto, req.user?.farmerId);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a paddy field' })
-  remove(@Param('id') id: string) {
-    return this.paddyFieldsService.remove(id);
+  remove(@Param('id') id: string, @Req() req: any) {
+    return this.paddyFieldsService.remove(id, req.user?.farmerId);
   }
 }

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateCultivationDto } from './dto/create-cultivation.dto';
@@ -36,7 +36,7 @@ export class CultivationsService {
     });
   }
 
-  async findOne(id: string): Promise<Cultivation> {
+  async findOne(id: string, farmerId?: string): Promise<Cultivation> {
     const cultivation = await this.cultivationRepository.findOne({
       where: { id },
       relations: ['paddyField'],
@@ -44,17 +44,20 @@ export class CultivationsService {
     if (!cultivation) {
       throw new NotFoundException(`Cultivation with ID ${id} not found`);
     }
+    if (farmerId && cultivation.paddyField.farmerId !== farmerId) {
+      throw new ForbiddenException('You do not own this cultivation');
+    }
     return cultivation;
   }
 
-  async update(id: string, updateCultivationDto: UpdateCultivationDto): Promise<Cultivation> {
-    const cultivation = await this.findOne(id);
+  async update(id: string, updateCultivationDto: UpdateCultivationDto, farmerId?: string): Promise<Cultivation> {
+    const cultivation = await this.findOne(id, farmerId);
     const updated = this.cultivationRepository.merge(cultivation, updateCultivationDto);
     return await this.cultivationRepository.save(updated);
   }
 
-  async remove(id: string): Promise<void> {
-    const cultivation = await this.findOne(id);
+  async remove(id: string, farmerId?: string): Promise<void> {
+    const cultivation = await this.findOne(id, farmerId);
     await this.cultivationRepository.remove(cultivation);
   }
 }
