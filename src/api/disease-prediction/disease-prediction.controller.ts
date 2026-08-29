@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { DiseasePredictionService } from './disease-prediction.service';
 import { CreateDiseasePredictionDto } from './dto/create-disease-prediction.dto';
@@ -23,14 +24,20 @@ export class DiseasePredictionController {
 
   @Post()
   @ApiOperation({ summary: 'Save a new AI disease prediction' })
-  create(@Body() createDiseasePredictionDto: CreateDiseasePredictionDto) {
-    return this.diseasePredictionService.create(createDiseasePredictionDto);
+  create(@Body() createDiseasePredictionDto: CreateDiseasePredictionDto, @Req() req: any) {
+    return this.diseasePredictionService.create(createDiseasePredictionDto, req.user?.farmerId);
   }
 
   @Get()
   @ApiOperation({ summary: 'Get all disease predictions' })
   findAll() {
     return this.diseasePredictionService.findAll();
+  }
+
+  @Get('my-predictions')
+  @ApiOperation({ summary: 'Get disease predictions for logged in farmer' })
+  findMyPredictions(@Req() req: any) {
+    return this.diseasePredictionService.findByFarmer(req.user?.farmerId);
   }
 
   @Get('cultivation/:cultivationId')
@@ -50,13 +57,14 @@ export class DiseasePredictionController {
   update(
     @Param('id') id: string,
     @Body() updateDiseasePredictionDto: UpdateDiseasePredictionDto,
+    @Req() req: any,
   ) {
-    return this.diseasePredictionService.update(id, updateDiseasePredictionDto);
+    return this.diseasePredictionService.update(id, updateDiseasePredictionDto, req.user?.farmerId);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a disease prediction log' })
-  remove(@Param('id') id: string) {
-    return this.diseasePredictionService.remove(id);
+  remove(@Param('id') id: string, @Req() req: any) {
+    return this.diseasePredictionService.remove(id, req.user?.farmerId);
   }
 }
