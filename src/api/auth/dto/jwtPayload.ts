@@ -11,5 +11,5 @@ export class JwtPayloadDto {
 
   userStatus!: string;
 
-  
+  farmerId?: string;
 }

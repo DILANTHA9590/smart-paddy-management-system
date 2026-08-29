@@ -32,7 +32,7 @@ export class AuthService {
 
     const existingUser = await this.userRepository.findOne({
       where: [{ email: login }, { userName: login }],
-      relations: ['role'],
+      relations: ['role', 'farmer'],
     });
 
     if (!existingUser) throw new NotFoundException('Inavlid username or email');
@@ -58,7 +58,7 @@ export class AuthService {
     if (!checkPassowrd) {
       throw new NotFoundException('Invalid password');
     }
-    const { id, firstName, lastName, email, tokenVersion, userStatus, role } =
+    const { id, firstName, lastName, email, tokenVersion, userStatus, role, farmer } =
       existingUser;
 
     const { refreshToken, accessToken } = this.genarateTokens({
@@ -69,6 +69,7 @@ export class AuthService {
       tokenVersion,
       userStatus,
       role: role?.roleName,
+      farmerId: farmer?.id,
     });
 
     console.log('refresh token', refreshToken);
@@ -92,7 +93,7 @@ export class AuthService {
 
   //genarate access token  and refsh token
   private genarateTokens(existingUser: TokenPayload) {
-    const { id, firstName, lastName, email, tokenVersion, userStatus, role } =
+    const { id, firstName, lastName, email, tokenVersion, userStatus, role, farmerId } =
       existingUser;
 
     const accessToken = this.jwtService.sign(
@@ -104,6 +105,7 @@ export class AuthService {
         tokenVersion,
         userStatus,
         role,
+        farmerId,
       },
       {
         expiresIn: '7d',
@@ -133,7 +135,7 @@ export class AuthService {
       where: {
         id: verifyToken.sub,
       },
-      relations: ['role'],
+      relations: ['role', 'farmer'],
     });
     if (!existingUser) throw new UnauthorizedException('User not found');
 
@@ -147,7 +149,7 @@ export class AuthService {
       throw new UnauthorizedException('Token Version Not Same');
     }
 
-    const { id, firstName, lastName, tokenVersion, userStatus, email, role } =
+    const { id, firstName, lastName, tokenVersion, userStatus, email, role, farmer } =
       existingUser;
 
     const userData: accessToken = {
@@ -158,6 +160,7 @@ export class AuthService {
       email,
       userStatus,
       role: role?.roleName,
+      farmerId: farmer?.id,
     };
 
     const accessToken: string = this.jwtService.sign(userData, {

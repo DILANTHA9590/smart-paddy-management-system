@@ -8,6 +8,7 @@ export interface accessToken {
   email?: string;
   userStatus: USER_STATUS;
   role?: string;
+  farmerId?: string;
 }
 
 export interface refreshToken {
@@ -24,4 +25,5 @@ export interface TokenPayload {
   tokenVersion: number;
   userStatus: USER_STATUS;
   role?: string;
+  farmerId?: string;
 }
