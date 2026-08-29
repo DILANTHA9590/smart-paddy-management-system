@@ -63,4 +63,12 @@ export class CreateUserDto {
   @IsOptional()
   @IsEnum(USER_STATUS, { message: 'Invalid user status value' })
   userStatus?: USER_STATUS;
+
+  @ApiPropertyOptional({
+    example: 'uuid-string-here',
+    description: 'Role ID to assign to the user on creation',
+  })
+  @IsOptional()
+  @IsString({ message: 'Role ID must be a string' })
+  roleId?: string;
 }

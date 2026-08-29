@@ -69,26 +69,26 @@ export class UserService {
       parallelism: 1,
     });
 
-    const count  = await this.userRepository.find()
-let role: Role | null = null;
-    if(count.length==0){
-          
- role = await  this.roleRepository.findOne({
-    where:{
-      roleName:UserRole.ADMIN
-    }
-    
-  })
-      
+    let roleIdToAssign = createUserDto.roleId;
 
+    if (!roleIdToAssign) {
+      const userCount = await this.userRepository.count();
+      if (userCount === 0) {
+        const adminRole = await this.roleRepository.findOne({
+          where: { roleName: UserRole.ADMIN },
+        });
+        roleIdToAssign = adminRole?.id;
+      }
     }
+
+    const { roleId, ...userEntityData } = createUserDto;
 
     // 👤 Create user
     const newUser = this.userRepository.create({
-      ...createUserDto,
+      ...userEntityData,
       password: hashedPassword,
-      isVerified: false, // OTP verify karanawanam false
-      role:{id:role?.id} as Role
+      isVerified: false,
+      role: roleIdToAssign ? ({ id: roleIdToAssign } as Role) : undefined,
     });
 
     await this.userRepository.save(newUser);

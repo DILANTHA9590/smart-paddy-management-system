@@ -32,6 +32,7 @@ export class AuthService {
 
     const existingUser = await this.userRepository.findOne({
       where: [{ email: login }, { userName: login }],
+      relations: ['role'],
     });
 
     if (!existingUser) throw new NotFoundException('Inavlid username or email');
@@ -57,7 +58,7 @@ export class AuthService {
     if (!checkPassowrd) {
       throw new NotFoundException('Invalid password');
     }
-    const { id, firstName, lastName, email, tokenVersion, userStatus } =
+    const { id, firstName, lastName, email, tokenVersion, userStatus, role } =
       existingUser;
 
     const { refreshToken, accessToken } = this.genarateTokens({
@@ -67,6 +68,7 @@ export class AuthService {
       email,
       tokenVersion,
       userStatus,
+      role: role?.roleName,
     });
 
     console.log('refresh token', refreshToken);
@@ -90,7 +92,7 @@ export class AuthService {
 
   //genarate access token  and refsh token
   private genarateTokens(existingUser: TokenPayload) {
-    const { id, firstName, lastName, email, tokenVersion, userStatus } =
+    const { id, firstName, lastName, email, tokenVersion, userStatus, role } =
       existingUser;
 
     const accessToken = this.jwtService.sign(
@@ -101,6 +103,7 @@ export class AuthService {
         email,
         tokenVersion,
         userStatus,
+        role,
       },
       {
         expiresIn: '7d',
@@ -130,6 +133,7 @@ export class AuthService {
       where: {
         id: verifyToken.sub,
       },
+      relations: ['role'],
     });
     if (!existingUser) throw new UnauthorizedException('User not found');
 
@@ -143,7 +147,7 @@ export class AuthService {
       throw new UnauthorizedException('Token Version Not Same');
     }
 
-    const { id, firstName, lastName, tokenVersion, userStatus, email } =
+    const { id, firstName, lastName, tokenVersion, userStatus, email, role } =
       existingUser;
 
     const userData: accessToken = {
@@ -153,6 +157,7 @@ export class AuthService {
       tokenVersion,
       email,
       userStatus,
+      role: role?.roleName,
     };
 
     const accessToken: string = this.jwtService.sign(userData, {

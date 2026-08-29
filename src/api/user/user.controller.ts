@@ -12,6 +12,9 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { UserRole } from '../roles/entities/role.enum';
 
 import {
   ApiTags,
@@ -38,7 +41,7 @@ import { VerifyOtpDto } from './dto/verify-otp.dto';
 
 @ApiTags('Users')
 @Controller('user')
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(AuthGuard('jwt'), RolesGuard)
 
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -72,6 +75,7 @@ export class UserController {
     return this.userService.resendOtp(dto);
   }
 
+  @Roles(UserRole.ADMIN)
   @Get('all')
   @ApiOperation({
     summary: 'Get all users',
@@ -104,6 +108,7 @@ export class UserController {
     return this.userService.findOne(id);
   }
 
+  @Roles(UserRole.ADMIN)
   @Patch('assign_role')
  @ApiBearerAuth()
   @ApiOperation({

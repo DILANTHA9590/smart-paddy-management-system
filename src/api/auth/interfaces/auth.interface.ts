@@ -7,6 +7,7 @@ export interface accessToken {
   tokenVersion?: number;
   email?: string;
   userStatus: USER_STATUS;
+  role?: string;
 }
 
 export interface refreshToken {
@@ -22,4 +23,5 @@ export interface TokenPayload {
   email: string;
   tokenVersion: number;
   userStatus: USER_STATUS;
+  role?: string;
 }

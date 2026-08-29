@@ -3,14 +3,15 @@ import {
   PrimaryGeneratedColumn,
   Column,
   OneToMany,
+  ManyToOne,
+  JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
   Index,
 } from 'typeorm';
 import { FarmersAssociationMember } from './farmers-association-member.entity';
 import { FarmersAssociationNotice } from './farmers-association-notice.entity';
-// import { FarmersAssociationMember } from './farmers-association-member.entity';
-// import { FarmersAssociationNotice } from './farmers-association-notice.entity';
+import { Farmer } from '../../farmers/entities/farmer.entity';
 
 @Entity('farmers_associations')
 export class FarmersAssociation {
@@ -40,6 +41,11 @@ export class FarmersAssociation {
 
   @Column()
   updatedBy!: string;
+
+  // farmer association and manager relationship (one manager per association)
+  @ManyToOne(() => Farmer, { nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'managerId' })
+  manager?: Farmer;
 
   @CreateDateColumn()
   createdAt!: Date;
