@@ -56,7 +56,7 @@ export class UserController {
     status: 201,
     description: 'User created successfully',
   })
-  create(@Body() createUserDto: CreateUserDto): Promise<ApiResponseDto<null>> {
+  create(@Body() createUserDto: CreateUserDto): Promise<ApiResponseDto<{ id: string }>> {
     return this.userService.create(createUserDto);
   }
 

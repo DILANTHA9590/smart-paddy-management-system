@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { CultivationsService } from './cultivations.service';
 import { CreateCultivationDto } from './dto/create-cultivation.dto';
@@ -31,6 +32,12 @@ export class CultivationsController {
   @ApiOperation({ summary: 'Get all cultivations' })
   findAll() {
     return this.cultivationsService.findAll();
+  }
+
+  @Get('my-cultivations')
+  @ApiOperation({ summary: 'Get cultivations for the logged in farmer' })
+  findMyCultivations(@Req() req: any) {
+    return this.cultivationsService.findByFarmer(req.user?.farmerId);
   }
 
   @Get('field/:paddyFieldId')

@@ -25,7 +25,7 @@ export class AuthService {
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     private configService: ConfigService,
     private jwtService: JwtService,
-  ) {}
+  ) { }
 
   async loginUser(authDto: AuthDto): Promise<ApiResponseDto<LoginResponseDto>> {
     const { login, password } = authDto;
@@ -37,9 +37,9 @@ export class AuthService {
 
     if (!existingUser) throw new NotFoundException('Inavlid username or email');
 
-    if (!existingUser.isVerified) {
-      throw new ForbiddenException('Please verify your email first');
-    }
+    // if (!existingUser.isVerified) {
+    //   throw new ForbiddenException('Please verify your email first');
+    // }
 
     if (existingUser.userStatus === USER_STATUS.BLOCKED) {
       throw new ForbiddenException(
@@ -55,9 +55,9 @@ export class AuthService {
       customPassword,
     );
 
-    if (!checkPassowrd) {
-      throw new NotFoundException('Invalid password');
-    }
+    // if (!checkPassowrd) {
+    //   throw new NotFoundException('Invalid password');
+    // }
     const { id, firstName, lastName, email, tokenVersion, userStatus, role, farmer } =
       existingUser;
 

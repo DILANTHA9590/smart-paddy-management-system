@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { FertilizerService } from './fertilizer.service';
 import { CreateFertilizerDto } from './dto/create-fertilizer.dto';
@@ -23,14 +24,20 @@ export class FertilizerController {
 
   @Post()
   @ApiOperation({ summary: 'Log a new fertilizer application' })
-  create(@Body() createFertilizerDto: CreateFertilizerDto) {
-    return this.fertilizerService.create(createFertilizerDto);
+  create(@Body() createFertilizerDto: CreateFertilizerDto, @Req() req: any) {
+    return this.fertilizerService.create(createFertilizerDto, req.user?.farmerId);
   }
 
   @Get()
   @ApiOperation({ summary: 'Get all fertilizer logs' })
   findAll() {
     return this.fertilizerService.findAll();
+  }
+
+  @Get('my-fertilizers')
+  @ApiOperation({ summary: 'Get fertilizer logs for the logged in farmer' })
+  findMyFertilizers(@Req() req: any) {
+    return this.fertilizerService.findByFarmer(req.user?.farmerId);
   }
 
   @Get('cultivation/:cultivationId')
@@ -50,13 +57,14 @@ export class FertilizerController {
   update(
     @Param('id') id: string,
     @Body() updateFertilizerDto: UpdateFertilizerDto,
+    @Req() req: any,
   ) {
-    return this.fertilizerService.update(id, updateFertilizerDto);
+    return this.fertilizerService.update(id, updateFertilizerDto, req.user?.farmerId);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a fertilizer log' })
-  remove(@Param('id') id: string) {
-    return this.fertilizerService.remove(id);
+  remove(@Param('id') id: string, @Req() req: any) {
+    return this.fertilizerService.remove(id, req.user?.farmerId);
   }
 }
