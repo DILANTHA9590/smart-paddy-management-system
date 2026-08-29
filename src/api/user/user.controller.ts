@@ -144,8 +144,7 @@ export class UserController {
     @Body() dto: AssignUserRoleDto,
     @Req() req: any,
   ) {
-    
-   console.log("run this bro 🌟🌟🌟🌟🌟🌟🌟🌟🌟",req)
+    return this.userService.assignUserRole(dto, req.user);
   }
 
   @Patch(':id')

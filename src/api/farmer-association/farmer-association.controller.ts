@@ -6,39 +6,53 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
+  Req,
+  Query,
 } from '@nestjs/common';
 import { FarmerAssociationService } from './farmer-association.service';
-// import { CreateFarmerAssociationDto } from './dto/create-farmer-association.dto';
+import { CreateFarmersAssociationDto } from './dto/create-farmer-association.dto';
 import { UpdateFarmerAssociationDto } from './dto/update-farmer-association.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { UserRole } from '../roles/entities/role.enum';
+import { SearchFarmersAssociationDto } from './dto/search-farmer-association.dto';
 
 @Controller('farmer-association')
+@UseGuards(AuthGuard('jwt'), RolesGuard)
 export class FarmerAssociationController {
   constructor(
     private readonly farmerAssociationService: FarmerAssociationService,
   ) {}
 
-  // @Post()
-  // create(@Body() createFarmerAssociationDto: CreateFarmerAssociationDto) {
-  //   return this.farmerAssociationService.create(createFarmerAssociationDto);
-  // }
+  @Post()
+  @Roles(UserRole.ADMIN)
+  create(@Body() createFarmerAssociationDto: CreateFarmersAssociationDto, @Req() req: any) {
+    return this.farmerAssociationService.create(createFarmerAssociationDto, req.user);
+  }
 
-  // @Get()
-  // findAll() {
-  //   return this.farmerAssociationService.findAll();
-  // }
+  @Get()
+  @Roles(UserRole.ADMIN)
+  findAll(@Query() searchDto: SearchFarmersAssociationDto, @Req() req: any) {
+    return this.farmerAssociationService.findAll(searchDto, req.user);
+  }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.farmerAssociationService.findOne(+id);
-  // }
+  @Get(':id')
+  @Roles(UserRole.ADMIN)
+  findOne(@Param('id') id: string) {
+    return this.farmerAssociationService.findOne(+id);
+  }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateFarmerAssociationDto: UpdateFarmerAssociationDto) {
-  //   return this.farmerAssociationService.update(+id, updateFarmerAssociationDto);
-  // }
+  @Patch(':id')
+  @Roles(UserRole.ADMIN)
+  update(@Param('id') id: string, @Body() updateFarmerAssociationDto: UpdateFarmerAssociationDto, @Req() req: any) {
+    return this.farmerAssociationService.update(id, updateFarmerAssociationDto, req.user);
+  }
 
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.farmerAssociationService.remove(+id);
-  // }
+  @Delete(':id')
+  @Roles(UserRole.ADMIN)
+  remove(@Param('id') id: string) {
+    return this.farmerAssociationService.remove(id);
+  }
 }

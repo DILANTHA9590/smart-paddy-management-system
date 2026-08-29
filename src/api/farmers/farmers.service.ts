@@ -15,6 +15,13 @@ import { ApiResponseDto } from 'src/common/dto/api-respose-dto';
 import { SearchFarmerDto } from './dto/search-farmer.dto';
 import { PaginatedDto } from 'src/common/dto/paginated.dto';
 import { JwtPayloadDto } from '../auth/dto/jwtPayload';
+import { DataSource } from 'typeorm';
+import { ConfigService } from '@nestjs/config';
+import * as argon2 from 'argon2';
+import { CreateFarmerFullDto } from './dto/create-farmer-full.dto';
+import { FarmersAssociationMember } from '../farmer-association/entities/farmers-association-member.entity';
+import { FarmersAssociation } from '../farmer-association/entities/farmer-association.entity';
+import { OtpService } from '../otp/otp.service';
 
 @Injectable()
 export class FarmersService {
@@ -23,6 +30,9 @@ export class FarmersService {
     @InjectRepository(Farmer)
     private readonly farmerRepository: Repository<Farmer>,
     @InjectRepository(Role) private readonly RoleRepository: Repository<Role>,
+    private readonly dataSource: DataSource,
+    private readonly configService: ConfigService,
+    private readonly otpService: OtpService,
   ) {}
   async create(
     dto: CreateFarmerDto,
@@ -63,6 +73,106 @@ export class FarmersService {
     };
   }
 
+  async adminCreateWithTransaction(
+    dto: CreateFarmerFullDto,
+    creatorId: string,
+  ): Promise<ApiResponseDto<null>> {
+    const { 
+      firstName, lastName, userName, email, password, roleId,
+      nic, phoneNumber, address, district, province, village, dateOfBirth, gender,
+      associationId 
+    } = dto;
+
+    // 🔎 Check existing user
+    const existingUser = await this.userRepository.findOne({
+      where: [{ email }, { userName }],
+    });
+
+    if (existingUser) {
+      if (existingUser.email === email) throw new ConflictException('Email already taken');
+      if (existingUser.userName === userName) throw new ConflictException('Username already taken');
+    }
+
+    // 🔎 Check existing farmer NIC
+    const existingFarmer = await this.farmerRepository.findOne({ where: { nic } });
+    if (existingFarmer) throw new ConflictException('NIC already exists');
+
+    // 🔐 Hash password
+    const pepper = this.configService.getOrThrow<string>('PASSWORD_PEPPER');
+    const hashedPassword = await argon2.hash(password + pepper, {
+      type: argon2.argon2id,
+      memoryCost: 2 ** 16,
+      timeCost: 3,
+      parallelism: 1,
+    });
+
+    // Start Transaction
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      // 1. Create User
+      const user = queryRunner.manager.create(User, {
+        firstName,
+        lastName,
+        userName,
+        email,
+        password: hashedPassword,
+        isVerified: false,
+        role: { id: roleId } as Role,
+      });
+      await queryRunner.manager.save(user);
+
+      // 2. Create Farmer Profile
+      const farmer = queryRunner.manager.create(Farmer, {
+        nic,
+        phoneNumber,
+        address,
+        district,
+        province,
+        village,
+        dateOfBirth: new Date(dateOfBirth),
+        gender,
+        createdBy: creatorId,
+        user: user,
+      });
+      await queryRunner.manager.save(farmer);
+
+      // 3. Create Association Membership (If provided)
+      if (associationId) {
+        // Validate association exists
+        const association = await queryRunner.manager.findOne(FarmersAssociation, {
+          where: { id: associationId }
+        });
+        if (!association) throw new NotFoundException('Farmers Association not found');
+
+        const membership = queryRunner.manager.create(FarmersAssociationMember, {
+          farmer: farmer,
+          association: association,
+        });
+        await queryRunner.manager.save(membership);
+      }
+
+      await queryRunner.commitTransaction();
+
+      // Trigger OTP creation outside of the transaction block
+      await this.otpService.create(email);
+
+      return {
+        success: true,
+        message: 'Farmer created successfully',
+        data: null,
+      };
+
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw err;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
   async findAll(
     dto: SearchFarmerDto,
   ): Promise<ApiResponseDto<PaginatedDto<Farmer>>> {
@@ -70,6 +180,7 @@ export class FarmersService {
 
     const query = this.farmerRepository
       .createQueryBuilder('farmer')
+      .leftJoinAndSelect('farmer.user', 'user')
       .select([
         'farmer.id',
         'farmer.nic',
@@ -79,6 +190,11 @@ export class FarmersService {
         'farmer.village',
         'farmer.gender',
         'farmer.createdAt',
+        'user.id',
+        'user.firstName',
+        'user.lastName',
+        'user.email',
+        'user.isVerified',
       ]);
 
     if (search) {

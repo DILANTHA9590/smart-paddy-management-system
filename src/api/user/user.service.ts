@@ -41,7 +41,7 @@ export class UserService {
 
   //create  new user
 
-  async create(createUserDto: CreateUserDto): Promise<ApiResponseDto<null>> {
+  async create(createUserDto: CreateUserDto): Promise<ApiResponseDto<{ id: string }>> {
     const { email, userName, password } = createUserDto;
 
     // 🔎 Check existing user (single DB query)
@@ -94,13 +94,10 @@ export class UserService {
     await this.userRepository.save(newUser);
     await this.otpService.create(email);
 
-    
-    
-
     return {
       success: true,
       message: 'User created successfully',
-      data: null,
+      data: { id: newUser.id },
     };
   }
 
