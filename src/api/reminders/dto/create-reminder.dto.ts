@@ -5,8 +5,8 @@ import { ReminderStatus, ReminderType } from '../entities/reminder.entity';
 export class CreateReminderDto {
   @ApiProperty({ example: 'uuid-of-farmer' })
   @IsUUID()
-  @IsNotEmpty()
-  farmerId: string;
+  @IsOptional()
+  farmerId?: string;
 
   @ApiProperty({ example: 'uuid-of-cultivation', required: false })
   @IsUUID()

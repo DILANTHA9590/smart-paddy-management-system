@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateReminderDto } from './dto/create-reminder.dto';
@@ -29,7 +29,7 @@ export class RemindersService {
     });
   }
 
-  async findOne(id: string): Promise<Reminder> {
+  async findOne(id: string, farmerId?: string): Promise<Reminder> {
     const reminder = await this.reminderRepository.findOne({
       where: { id },
       relations: ['farmer', 'cultivation'],
@@ -37,17 +37,20 @@ export class RemindersService {
     if (!reminder) {
       throw new NotFoundException(`Reminder with ID ${id} not found`);
     }
+    if (farmerId && reminder.farmerId !== farmerId) {
+      throw new ForbiddenException('You do not own this reminder');
+    }
     return reminder;
   }
 
-  async update(id: string, updateReminderDto: UpdateReminderDto): Promise<Reminder> {
-    const reminder = await this.findOne(id);
+  async update(id: string, updateReminderDto: UpdateReminderDto, farmerId?: string): Promise<Reminder> {
+    const reminder = await this.findOne(id, farmerId);
     const updated = this.reminderRepository.merge(reminder, updateReminderDto);
     return await this.reminderRepository.save(updated);
   }
 
-  async remove(id: string): Promise<void> {
-    const reminder = await this.findOne(id);
+  async remove(id: string, farmerId?: string): Promise<void> {
+    const reminder = await this.findOne(id, farmerId);
     await this.reminderRepository.remove(reminder);
   }
 }

@@ -61,13 +61,14 @@ export class RemindersController {
   update(
     @Param('id') id: string,
     @Body() updateReminderDto: UpdateReminderDto,
+    @Req() req: any,
   ) {
-    return this.remindersService.update(id, updateReminderDto);
+    return this.remindersService.update(id, updateReminderDto, req.user?.farmerId);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a reminder' })
-  remove(@Param('id') id: string) {
-    return this.remindersService.remove(id);
+  remove(@Param('id') id: string, @Req() req: any) {
+    return this.remindersService.remove(id, req.user?.farmerId);
   }
 }
