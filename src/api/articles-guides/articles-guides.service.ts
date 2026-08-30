@@ -6,7 +6,7 @@ import { UpdateArticleGuideDto } from './dto/update-article-guide.dto';
 import { ArticleGuide } from './entities/article-guide.entity';
 import { FarmersAssociation } from '../farmer-association/entities/farmer-association.entity';
 import { FarmersAssociationMember } from '../farmer-association/entities/farmers-association-member.entity';
-import { UserRole } from '../roles/entities/role.entity';
+import { UserRole } from '../roles/entities/role.enum';
 
 @Injectable()
 export class ArticlesGuidesService {
@@ -24,7 +24,7 @@ export class ArticlesGuidesService {
 
     if (userRole === UserRole.ORGANIZATION_MANAGER && farmerId) {
       const managedOrg = await this.associationRepository.findOne({
-        where: { managerId: farmerId },
+        where: { manager: { id: farmerId } },
       });
       if (!managedOrg) {
         throw new ForbiddenException('You do not manage any organization');
@@ -49,15 +49,16 @@ export class ArticlesGuidesService {
     if (farmerId) {
       if (userRole === UserRole.ORGANIZATION_MANAGER) {
         const managedOrg = await this.associationRepository.findOne({
-          where: { managerId: farmerId },
+          where: { manager: { id: farmerId } },
         });
         if (managedOrg) allowedAssociationIds.push(managedOrg.id);
       }
 
       const memberships = await this.memberRepository.find({
-        where: { farmerId },
+        where: { farmer: { id: farmerId } },
+        relations: ['association'],
       });
-      allowedAssociationIds.push(...memberships.map((m) => m.associationId));
+      allowedAssociationIds.push(...memberships.map((m) => m.association?.id).filter((id): id is string => id !== undefined));
     }
 
     allowedAssociationIds = [...new Set(allowedAssociationIds)]; // Deduplicate
@@ -90,15 +91,16 @@ export class ArticlesGuidesService {
     if (farmerId) {
       if (userRole === UserRole.ORGANIZATION_MANAGER) {
         const managedOrg = await this.associationRepository.findOne({
-          where: { managerId: farmerId },
+          where: { manager: { id: farmerId } },
         });
         if (managedOrg) allowedAssociationIds.push(managedOrg.id);
       }
 
       const memberships = await this.memberRepository.find({
-        where: { farmerId },
+        where: { farmer: { id: farmerId } },
+        relations: ['association'],
       });
-      allowedAssociationIds.push(...memberships.map((m) => m.associationId));
+      allowedAssociationIds.push(...memberships.map((m) => m.association?.id).filter((id): id is string => id !== undefined));
     }
 
     if (article.associationId !== null && !allowedAssociationIds.includes(article.associationId)) {
@@ -113,7 +115,7 @@ export class ArticlesGuidesService {
 
     if (userRole === UserRole.ORGANIZATION_MANAGER && farmerId) {
       const managedOrg = await this.associationRepository.findOne({
-        where: { managerId: farmerId },
+        where: { manager: { id: farmerId } },
       });
       if (!managedOrg || article.associationId !== managedOrg.id) {
         throw new ForbiddenException('You can only update articles belonging to your managed organization');
@@ -132,7 +134,7 @@ export class ArticlesGuidesService {
 
     if (userRole === UserRole.ORGANIZATION_MANAGER && farmerId) {
       const managedOrg = await this.associationRepository.findOne({
-        where: { managerId: farmerId },
+        where: { manager: { id: farmerId } },
       });
       if (!managedOrg || article.associationId !== managedOrg.id) {
         throw new ForbiddenException('You can only delete articles belonging to your managed organization');

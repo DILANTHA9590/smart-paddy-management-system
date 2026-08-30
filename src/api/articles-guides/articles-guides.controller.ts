@@ -16,7 +16,7 @@ import { ApiBearerAuth, ApiTags, ApiOperation } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { UserRole } from '../roles/entities/role.entity';
+import { UserRole } from '../roles/entities/role.enum';
 
 @ApiTags('Articles & Guides')
 @Controller('articles-guides')

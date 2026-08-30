@@ -47,7 +47,7 @@ export class GovijanaSewaService {
 
     const govijanaSewa = this.govijanaSewaRepository.create({
       ...createDto,
-      association: associationId ? { id: associationId } as FarmersAssociation : null,
+      association: associationId ? ({ id: associationId } as FarmersAssociation) : undefined,
       publishedAt: createDto.publishedAt ? new Date(createDto.publishedAt) : new Date(),
     });
 
