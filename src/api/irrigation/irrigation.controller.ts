@@ -25,7 +25,7 @@ export class IrrigationController {
   @Post()
   @ApiOperation({ summary: 'Log a new irrigation activity' })
   create(@Body() createIrrigationDto: CreateIrrigationDto, @Req() req: any) {
-    return this.irrigationService.create(createIrrigationDto, req.user?.farmerId);
+    return this.irrigationService.create(createIrrigationDto, req.user);
   }
 
   @Get()
@@ -37,7 +37,7 @@ export class IrrigationController {
   @Get('my-irrigation')
   @ApiOperation({ summary: 'Get irrigation logs for the logged in farmer' })
   findMyIrrigation(@Req() req: any) {
-    return this.irrigationService.findByFarmer(req.user?.farmerId);
+    return this.irrigationService.findByFarmer(req.user);
   }
 
   @Get('cultivation/:cultivationId')
@@ -48,8 +48,8 @@ export class IrrigationController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get an irrigation log by id' })
-  findOne(@Param('id') id: string) {
-    return this.irrigationService.findOne(id);
+  findOne(@Param('id') id: string, @Req() req: any) {
+    return this.irrigationService.findOne(id, req.user);
   }
 
   @Patch(':id')
@@ -59,12 +59,12 @@ export class IrrigationController {
     @Body() updateIrrigationDto: UpdateIrrigationDto,
     @Req() req: any,
   ) {
-    return this.irrigationService.update(id, updateIrrigationDto, req.user?.farmerId);
+    return this.irrigationService.update(id, updateIrrigationDto, req.user);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete an irrigation log' })
   remove(@Param('id') id: string, @Req() req: any) {
-    return this.irrigationService.remove(id, req.user?.farmerId);
+    return this.irrigationService.remove(id, req.user);
   }
 }

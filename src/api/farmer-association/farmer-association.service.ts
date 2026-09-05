@@ -42,6 +42,7 @@ export class FarmerAssociationService {
       ...dto,
       associationCode,
       createdBy: user.sub,
+      updatedBy: user.sub,
     });
 
     return {
@@ -56,7 +57,6 @@ export class FarmerAssociationService {
     const associationNumber = await this.famerAssociationRepository.findOne({
       where: {},
       order: { createdAt: 'DESC' },
-      lock: { mode: 'pessimistic_write' },
     });
 
     let nextNumber: Number = 100;
@@ -123,7 +123,9 @@ export class FarmerAssociationService {
   }
 
   async findAll(dto: SearchFarmersAssociationDto, user: JwtPayloadDto) {
-    const { search, district, village, province, limit, page } = dto;
+    const { search, district, village, province } = dto;
+    const limit = dto.limit || 10;
+    const page = dto.page || 1;
     // 🔹 Role filter එක මුලින්
     // switch (user.role) {
     //   case Role.ADMIN:
@@ -151,28 +153,22 @@ export class FarmerAssociationService {
 
     if (search) {
       query.andWhere(
-        'association.name LIKE :search OR association,associationCode LIKE :search',
+        '(association.name LIKE :search OR association.associationCode LIKE :search)',
         {
-          search: search,
+          search: `%${search}%`,
         },
       );
     }
 
     if (province) {
-      query.andWhere('association.province LIKE :search', {
-        search: `%${search}%`,
+      query.andWhere('association.province LIKE :province', {
+        province: `%${province}%`,
       });
     }
 
     if (district) {
-      query.andWhere('association.district LIKE :search', {
-        search: `%${search}%`,
-      });
-    }
-
-    if (province) {
-      query.andWhere('association.province LIKE :search', {
-        search: `%${search}%`,
+      query.andWhere('association.district LIKE :district', {
+        district: `%${district}%`,
       });
     }
 
@@ -195,7 +191,79 @@ export class FarmerAssociationService {
     };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} farmerAssociation`;
+  async findOne(id: string): Promise<ApiResponseDto<FarmersAssociation>> {
+    const association = await this.famerAssociationRepository.findOne({
+      where: { id },
+      relations: ['manager', 'manager.user', 'members', 'members.farmer', 'members.farmer.user']
+    });
+
+    if (!association) {
+      throw new NotFoundException('Farmers association not found.');
+    }
+
+    return {
+      success: true,
+      message: 'Farmers association retrieved successfully.',
+      data: association,
+    };
+  }
+
+  async findMyOrg(farmerId: string): Promise<ApiResponseDto<FarmersAssociation>> {
+    const association = await this.famerAssociationRepository.findOne({
+      where: { manager: { id: farmerId } },
+      relations: ['manager']
+    });
+
+    if (!association) {
+      throw new NotFoundException('You do not manage any organization.');
+    }
+
+    return {
+      success: true,
+      message: 'Managed organization retrieved successfully.',
+      data: association,
+    };
+  }
+
+  async findMyOrgMembers(farmerId: string): Promise<ApiResponseDto<any>> {
+    const association = await this.famerAssociationRepository.findOne({
+      where: { manager: { id: farmerId } },
+      relations: ['members', 'members.farmer']
+    });
+
+    if (!association) {
+      throw new NotFoundException('You do not manage any organization.');
+    }
+
+    return {
+      success: true,
+      message: 'Organization members retrieved successfully.',
+      data: association.members || [],
+    };
+  }
+
+  async findMyOrgStats(farmerId: string): Promise<ApiResponseDto<any>> {
+    const association = await this.famerAssociationRepository.findOne({
+      where: { manager: { id: farmerId } },
+      relations: ['members', 'notices']
+    });
+
+    if (!association) {
+      throw new NotFoundException('You do not manage any organization.');
+    }
+
+    const totalMembers = association.members ? association.members.length : 0;
+    const activeAnnouncements = association.notices ? association.notices.length : 0;
+    const pendingRequests = 0; // Placeholder
+
+    return {
+      success: true,
+      message: 'Organization stats retrieved successfully.',
+      data: {
+        totalMembers,
+        pendingRequests,
+        activeAnnouncements
+      },
+    };
   }
 }

@@ -28,6 +28,7 @@ export class AuthService {
   ) { }
 
   async loginUser(authDto: AuthDto): Promise<ApiResponseDto<LoginResponseDto>> {
+    console.log("🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴")
     const { login, password } = authDto;
 
     const existingUser = await this.userRepository.findOne({

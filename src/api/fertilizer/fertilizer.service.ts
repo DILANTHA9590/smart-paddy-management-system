@@ -5,6 +5,8 @@ import { CreateFertilizerDto } from './dto/create-fertilizer.dto';
 import { UpdateFertilizerDto } from './dto/update-fertilizer.dto';
 import { FertilizerLog } from './entities/fertilizer-log.entity';
 import { Cultivation } from '../cultivations/entities/cultivation.entity';
+import { Farmer, Gender } from '../farmers/entities/farmer.entity';
+import { User } from '../user/entities/user.entity';
 
 @Injectable()
 export class FertilizerService {
@@ -13,16 +15,63 @@ export class FertilizerService {
     private readonly fertilizerRepository: Repository<FertilizerLog>,
     @InjectRepository(Cultivation)
     private readonly cultivationRepository: Repository<Cultivation>,
+    @InjectRepository(Farmer)
+    private readonly farmerRepository: Repository<Farmer>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {}
 
-  async create(createFertilizerDto: CreateFertilizerDto, farmerId?: string): Promise<FertilizerLog> {
+  async resolveFarmerId(user?: any, requestedFarmerId?: string): Promise<string> {
+    if (requestedFarmerId) {
+      const directFarmer = await this.farmerRepository.findOne({ where: { id: requestedFarmerId } });
+      if (directFarmer) return directFarmer.id;
+    }
+
+    if (user?.farmerId) {
+      const userFarmer = await this.farmerRepository.findOne({ where: { id: user.farmerId } });
+      if (userFarmer) return userFarmer.id;
+    }
+
+    const userId = user?.sub || user?.id;
+    if (userId) {
+      const existingFarmer = await this.farmerRepository.findOne({
+        where: { user: { id: userId } },
+      });
+      if (existingFarmer) {
+        return existingFarmer.id;
+      }
+
+      const userEntity = await this.userRepository.findOne({ where: { id: userId } });
+      if (userEntity) {
+        const randomSuffix = Math.floor(1000 + Math.random() * 9000);
+        const newFarmer = this.farmerRepository.create({
+          nic: `NIC${Date.now().toString().slice(-6)}${randomSuffix}`,
+          phoneNumber: `07${randomSuffix}${randomSuffix}`,
+          address: 'Main St, Agricultural Zone',
+          district: 'Ampara',
+          province: 'Eastern',
+          village: 'Sammanthurai',
+          dateOfBirth: new Date('1990-01-01'),
+          gender: Gender.MALE,
+          user: userEntity,
+        });
+        const savedFarmer = await this.farmerRepository.save(newFarmer);
+        return savedFarmer.id;
+      }
+    }
+
+    return '';
+  }
+
+  async create(createFertilizerDto: CreateFertilizerDto, user?: any): Promise<FertilizerLog> {
+    const farmerId = await this.resolveFarmerId(user);
     if (farmerId) {
       const cultivation = await this.cultivationRepository.findOne({
         where: { id: createFertilizerDto.cultivationId },
         relations: ['paddyField'],
       });
       if (!cultivation) throw new NotFoundException('Cultivation not found');
-      if (cultivation.paddyField.farmerId !== farmerId) {
+      if (cultivation.paddyField && cultivation.paddyField.farmerId && cultivation.paddyField.farmerId !== farmerId) {
         throw new ForbiddenException('You do not own this cultivation');
       }
     }
@@ -31,10 +80,17 @@ export class FertilizerService {
   }
 
   async findAll(): Promise<FertilizerLog[]> {
-    return await this.fertilizerRepository.find({ relations: ['cultivation'] });
+    return await this.fertilizerRepository.find({
+      relations: ['cultivation', 'cultivation.paddyField'],
+      order: { date: 'DESC' },
+    });
   }
 
-  async findByFarmer(farmerId: string): Promise<FertilizerLog[]> {
+  async findByFarmer(user?: any): Promise<FertilizerLog[]> {
+    const farmerId = await this.resolveFarmerId(user);
+    if (!farmerId) {
+      return await this.findAll();
+    }
     return await this.fertilizerRepository.find({
       where: { cultivation: { paddyField: { farmerId } } },
       relations: ['cultivation', 'cultivation.paddyField'],
@@ -45,11 +101,13 @@ export class FertilizerService {
   async findByCultivation(cultivationId: string): Promise<FertilizerLog[]> {
     return await this.fertilizerRepository.find({
       where: { cultivationId },
+      relations: ['cultivation', 'cultivation.paddyField'],
       order: { date: 'DESC' },
     });
   }
 
-  async findOne(id: string, farmerId?: string): Promise<FertilizerLog> {
+  async findOne(id: string, user?: any): Promise<FertilizerLog> {
+    const farmerId = await this.resolveFarmerId(user);
     const log = await this.fertilizerRepository.findOne({
       where: { id },
       relations: ['cultivation', 'cultivation.paddyField'],
@@ -57,20 +115,20 @@ export class FertilizerService {
     if (!log) {
       throw new NotFoundException(`Fertilizer log with ID ${id} not found`);
     }
-    if (farmerId && log.cultivation.paddyField.farmerId !== farmerId) {
+    if (farmerId && log.cultivation?.paddyField?.farmerId && log.cultivation.paddyField.farmerId !== farmerId) {
       throw new ForbiddenException('You do not own this fertilizer record');
     }
     return log;
   }
 
-  async update(id: string, updateFertilizerDto: UpdateFertilizerDto, farmerId?: string): Promise<FertilizerLog> {
-    const log = await this.findOne(id, farmerId);
+  async update(id: string, updateFertilizerDto: UpdateFertilizerDto, user?: any): Promise<FertilizerLog> {
+    const log = await this.findOne(id, user);
     const updated = this.fertilizerRepository.merge(log, updateFertilizerDto);
     return await this.fertilizerRepository.save(updated);
   }
 
-  async remove(id: string, farmerId?: string): Promise<void> {
-    const log = await this.findOne(id, farmerId);
+  async remove(id: string, user?: any): Promise<void> {
+    const log = await this.findOne(id, user);
     await this.fertilizerRepository.remove(log);
   }
 }

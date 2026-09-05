@@ -22,6 +22,9 @@ export class CultivationsService {
   }
 
   async findByFarmer(farmerId: string): Promise<Cultivation[]> {
+    if (!farmerId) {
+      return await this.findAll();
+    }
     return await this.cultivationRepository.find({
       where: { paddyField: { farmerId } },
       relations: ['paddyField'],

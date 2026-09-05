@@ -30,7 +30,7 @@ async function bootstrap() {
 
   // 🔹 CORS
   app.enableCors({
-    origin: clientUrl,
+    origin: true, // Allow any origin in dev (e.g., 5173 or 5174)
     credentials: true,
   });
 

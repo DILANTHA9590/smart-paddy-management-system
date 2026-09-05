@@ -79,33 +79,21 @@ export class FarmersService {
     creatorId: string,
   ): Promise<ApiResponseDto<null>> {
     const { 
-      firstName, lastName, userName, email, password, roleId,
+      userId,
       nic, phoneNumber, address, district, province, village, dateOfBirth, gender,
       associationId 
     } = dto;
 
     // 🔎 Check existing user
     const existingUser = await this.userRepository.findOne({
-      where: [{ email }, { userName }],
+      where: { id: userId },
     });
 
-    if (existingUser) {
-      if (existingUser.email === email) throw new ConflictException('Email already taken');
-      if (existingUser.userName === userName) throw new ConflictException('Username already taken');
-    }
+    if (!existingUser) throw new NotFoundException('User not found');
 
     // 🔎 Check existing farmer NIC
     const existingFarmer = await this.farmerRepository.findOne({ where: { nic } });
     if (existingFarmer) throw new ConflictException('NIC already exists');
-
-    // 🔐 Hash password
-    const pepper = this.configService.getOrThrow<string>('PASSWORD_PEPPER');
-    const hashedPassword = await argon2.hash(password + pepper, {
-      type: argon2.argon2id,
-      memoryCost: 2 ** 16,
-      timeCost: 3,
-      parallelism: 1,
-    });
 
     // Start Transaction
     const queryRunner = this.dataSource.createQueryRunner();
@@ -113,19 +101,7 @@ export class FarmersService {
     await queryRunner.startTransaction();
 
     try {
-      // 1. Create User
-      const user = queryRunner.manager.create(User, {
-        firstName,
-        lastName,
-        userName,
-        email,
-        password: hashedPassword,
-        isVerified: false,
-        role: { id: roleId } as Role,
-      });
-      await queryRunner.manager.save(user);
-
-      // 2. Create Farmer Profile
+      // 1. Create Farmer Profile
       const farmer = queryRunner.manager.create(Farmer, {
         nic,
         phoneNumber,
@@ -136,11 +112,11 @@ export class FarmersService {
         dateOfBirth: new Date(dateOfBirth),
         gender,
         createdBy: creatorId,
-        user: user,
+        user: existingUser,
       });
       await queryRunner.manager.save(farmer);
 
-      // 3. Create Association Membership (If provided)
+      // 2. Create Association Membership (If provided)
       if (associationId) {
         // Validate association exists
         const association = await queryRunner.manager.findOne(FarmersAssociation, {
@@ -157,12 +133,9 @@ export class FarmersService {
 
       await queryRunner.commitTransaction();
 
-      // Trigger OTP creation outside of the transaction block
-      await this.otpService.create(email);
-
       return {
         success: true,
-        message: 'Farmer created successfully',
+        message: 'Farmer profile created successfully',
         data: null,
       };
 
@@ -177,7 +150,9 @@ export class FarmersService {
   async findAll(
     dto: SearchFarmerDto,
   ): Promise<ApiResponseDto<PaginatedDto<Farmer>>> {
-    const { search, province, district, village, gender, page, limit } = dto;
+    const { search, province, district, village, gender } = dto;
+    const limit = dto.limit || 10;
+    const page = dto.page || 1;
 
     const query = this.farmerRepository
       .createQueryBuilder('farmer')
@@ -247,6 +222,31 @@ export class FarmersService {
         totalPages,
         limit,
       },
+    };
+  }
+
+  async findAvailableUsers(): Promise<ApiResponseDto<User[]>> {
+    // Find users with FARMER or ORGANIZATION_MANAGER roles that are NOT in the farmers table.
+    const query = this.userRepository
+      .createQueryBuilder('user')
+      .innerJoinAndSelect('user.role', 'role')
+      .leftJoin('user.farmer', 'farmer')
+      .where('role.roleName IN (:...roles)', { roles: [UserRole.FARMER, UserRole.ORGANIZATION_MANAGER] })
+      .andWhere('farmer.id IS NULL')
+      .select([
+        'user.id',
+        'user.firstName',
+        'user.lastName',
+        'user.email',
+        'user.userName'
+      ]);
+
+    const users = await query.getMany();
+
+    return {
+      success: true,
+      message: 'Available users retrieved successfully',
+      data: users,
     };
   }
   async findOne(id: string): Promise<ApiResponseDto<Farmer>> {

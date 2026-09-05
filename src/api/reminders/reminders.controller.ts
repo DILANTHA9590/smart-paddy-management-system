@@ -25,11 +25,7 @@ export class RemindersController {
   @Post()
   @ApiOperation({ summary: 'Create a new reminder' })
   create(@Body() createReminderDto: CreateReminderDto, @Req() req: any) {
-    // If not provided in body, use logged in user's farmer ID
-    if (!createReminderDto.farmerId && req.user?.farmerId) {
-      createReminderDto.farmerId = req.user.farmerId;
-    }
-    return this.remindersService.create(createReminderDto);
+    return this.remindersService.create(createReminderDto, req.user);
   }
 
   @Get()
@@ -41,7 +37,7 @@ export class RemindersController {
   @Get('my-reminders')
   @ApiOperation({ summary: 'Get reminders for logged in farmer' })
   findMyReminders(@Req() req: any) {
-    return this.remindersService.findByFarmer(req.user?.farmerId);
+    return this.remindersService.findByUser(req.user);
   }
 
   @Get('farmer/:farmerId')

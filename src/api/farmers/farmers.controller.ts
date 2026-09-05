@@ -42,6 +42,12 @@ export class FarmersController {
     return this.farmersService.findAll(searchDto);
   }
 
+  @Get('available-users')
+  @Roles(UserRole.ADMIN)
+  findAvailableUsers() {
+    return this.farmersService.findAvailableUsers();
+  }
+
   @Get(':id')
   @Roles(UserRole.ADMIN, UserRole.FARMER, UserRole.ORGANIZATION_MANAGER)
   findOne(@Param('id') id: string) {

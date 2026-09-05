@@ -41,7 +41,7 @@ export class FarmerAssociationController {
   @Get(':id')
   @Roles(UserRole.ADMIN)
   findOne(@Param('id') id: string) {
-    return this.farmerAssociationService.findOne(+id);
+    return this.farmerAssociationService.findOne(id);
   }
 
   @Patch(':id')
@@ -54,5 +54,23 @@ export class FarmerAssociationController {
   @Roles(UserRole.ADMIN)
   remove(@Param('id') id: string) {
     return this.farmerAssociationService.remove(id);
+  }
+
+  @Get('my-org/stats')
+  @Roles(UserRole.ORGANIZATION_MANAGER)
+  findMyOrgStats(@Req() req: any) {
+    return this.farmerAssociationService.findMyOrgStats(req.user.farmerId);
+  }
+
+  @Get('my-org/members')
+  @Roles(UserRole.ORGANIZATION_MANAGER)
+  findMyOrgMembers(@Req() req: any) {
+    return this.farmerAssociationService.findMyOrgMembers(req.user.farmerId);
+  }
+
+  @Get('my-org')
+  @Roles(UserRole.ORGANIZATION_MANAGER)
+  findMyOrg(@Req() req: any) {
+    return this.farmerAssociationService.findMyOrg(req.user.farmerId);
   }
 }

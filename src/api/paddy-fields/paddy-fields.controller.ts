@@ -25,9 +25,7 @@ export class PaddyFieldsController {
   @Post()
   @ApiOperation({ summary: 'Create a new paddy field' })
   create(@Body() createPaddyFieldDto: CreatePaddyFieldDto, @Req() req: any) {
-    // Assuming req.user contains the authenticated user details and farmerId
-    // If not, it falls back to the farmerId provided in the DTO
-    return this.paddyFieldsService.create(createPaddyFieldDto, req.user?.farmerId);
+    return this.paddyFieldsService.create(createPaddyFieldDto, req.user);
   }
 
   @Get()
@@ -39,7 +37,7 @@ export class PaddyFieldsController {
   @Get('my-fields')
   @ApiOperation({ summary: 'Get paddy fields for the logged in farmer' })
   findMyFields(@Req() req: any) {
-    return this.paddyFieldsService.findByFarmer(req.user?.farmerId);
+    return this.paddyFieldsService.findByUser(req.user);
   }
 
   @Get(':id')
@@ -55,12 +53,12 @@ export class PaddyFieldsController {
     @Body() updatePaddyFieldDto: UpdatePaddyFieldDto,
     @Req() req: any,
   ) {
-    return this.paddyFieldsService.update(id, updatePaddyFieldDto, req.user?.farmerId);
+    return this.paddyFieldsService.update(id, updatePaddyFieldDto, req.user);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a paddy field' })
   remove(@Param('id') id: string, @Req() req: any) {
-    return this.paddyFieldsService.remove(id, req.user?.farmerId);
+    return this.paddyFieldsService.remove(id, req.user);
   }
 }

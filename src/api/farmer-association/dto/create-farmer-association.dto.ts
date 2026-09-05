@@ -23,6 +23,14 @@ export class CreateFarmersAssociationDto {
   district!: string;
 
   @ApiProperty({
+    example: 'Central',
+    description: 'Province where the farmers association is located',
+  })
+  @IsString()
+  @IsNotEmpty()
+  province!: string;
+
+  @ApiProperty({
     example: 'Peradeniya',
     description: 'Village where the farmers association is located',
   })

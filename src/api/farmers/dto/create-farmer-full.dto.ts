@@ -12,29 +12,7 @@ export class CreateFarmerFullDto {
   // User Fields
   @IsString()
   @IsNotEmpty()
-  firstName!: string;
-
-  @IsString()
-  @IsOptional()
-  lastName?: string;
-
-  @IsString()
-  @IsNotEmpty()
-  userName!: string;
-
-  @IsEmail()
-  @IsNotEmpty()
-  email!: string;
-
-  @IsString()
-  @IsNotEmpty()
-  password!: string;
-
-  @IsString()
-  @IsNotEmpty()
-  roleId!: string;
-
-  // Farmer Fields
+  userId!: string;
   @IsString()
   @IsNotEmpty()
   nic!: string;
