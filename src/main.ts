@@ -16,8 +16,20 @@ async function bootstrap() {
   const clientUrl =
     configService.get<string>('CLIENT_URL') || 'http://localhost:3000';
 
+  // 🔹 CORS
+  app.enableCors({
+    origin: true, // Allow any origin in dev (e.g., 5173 or 5174)
+    credentials: true,
+  });
+
   // 🔹 Global Prefix FIRST
   app.setGlobalPrefix('api/v1');
+
+  // 🔹 Body Limit (50MB for AI Image Uploads)
+  app.use(cookieParser());
+  const express = require('express');
+  app.use(express.json({ limit: '50mb' }));
+  app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
   // 🔹 Validation Pipe
   app.useGlobalPipes(
@@ -27,15 +39,6 @@ async function bootstrap() {
       transform: true,
     }),
   );
-
-  // 🔹 CORS
-  app.enableCors({
-    origin: true, // Allow any origin in dev (e.g., 5173 or 5174)
-    credentials: true,
-  });
-
-  // 🔹 Cookie Parser
-  app.use(cookieParser());
 
   // 🔹 Swagger Config
   const swaggerConfig = new DocumentBuilder()

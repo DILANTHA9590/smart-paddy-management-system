@@ -291,6 +291,149 @@ ${dto.message}
     }
   }
 
+  async sendDiseaseAdvisoryEmail(
+    recipientEmail: string,
+    farmerName: string,
+    diagnosisData: {
+      diseaseName: string;
+      scientificName?: string;
+      confidenceScore: number;
+      severity: string;
+      sinhalaDescription?: string;
+      chemicalRemedies?: string;
+      organicRemedies?: string;
+      treatmentRecommendation: string;
+      imageUrl?: string;
+      cropVariety?: string;
+      fieldName?: string;
+    },
+  ): Promise<void> {
+    try {
+      const from = this.configService.get<string>('MAIL_FROM') || 'PaddyWise AI <noreply@paddywise.lk>';
+      const isHealthy = diagnosisData.diseaseName.toLowerCase().includes('healthy') || diagnosisData.severity?.toLowerCase() === 'healthy';
+
+      const alertColor = isHealthy ? '#15803d' : diagnosisData.severity === 'High' ? '#dc2626' : '#d97706';
+      const alertBg = isHealthy ? '#f0fdf4' : diagnosisData.severity === 'High' ? '#fef2f2' : '#fffbeb';
+      const alertBorder = isHealthy ? '#22c55e' : diagnosisData.severity === 'High' ? '#f87171' : '#fcd34d';
+
+      await this.transporter.sendMail({
+        from,
+        to: recipientEmail,
+        cc: 'dilanthanayanajith@gmail.com',
+        subject: isHealthy
+          ? `🌿 [PaddyWise AI] ගොයම් කොළය නිරෝගීයි: ${diagnosisData.cropVariety || 'වී වගාව'}`
+          : `⚠️ [PaddyWise AI රෝග හඳුනාගැනීම] ${diagnosisData.diseaseName} - කඩිනම් ප්‍රතිකාර උපදෙස්`,
+        html: `
+          <div style="font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #1f2937; max-width: 640px; margin: 0 auto; border: 1px solid #e5e7eb; border-radius: 18px; overflow: hidden; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);">
+            {/* Header */}
+            <div style="background: linear-gradient(135deg, ${alertColor}, #111827); padding: 28px 24px; text-align: center; color: white;">
+              <span style="background-color: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
+                🤖 Gemini AI Vision Diagnosis Report
+              </span>
+              <h1 style="margin: 12px 0 4px 0; font-size: 24px; font-weight: 800;">
+                🌾 ගොයම් රෝග නිර්ණය & ප්‍රතිකාර වාර්තාව
+              </h1>
+              <p style="margin: 0; opacity: 0.9; font-size: 14px;">
+                Department of Agriculture Verified Advisory • Sri Lanka
+              </p>
+            </div>
+            
+            <div style="padding: 28px; background-color: #ffffff;">
+              <p style="font-size: 15px; margin-top: 0;">ගරු <strong>${farmerName}</strong> මහතාණෙනි/මහත්මියනි,</p>
+              <p style="font-size: 14px; color: #4b5563;">
+                ඔබ විසින් පද්ධතියට Upload කරන ලද ගොයම් පත්‍රයේ ඡායාරූපය <strong>Google Gemini AI Vision</strong> තාක්ෂණය ඔස්සේ පරීක්ෂා කිරීමෙන් පසු පහත නිගමනයට එළඹ ඇත:
+              </p>
+
+              {/* DISEASE HIGHLIGHT CARD */}
+              <div style="background: ${alertBg}; border: 2px solid ${alertBorder}; border-radius: 14px; padding: 20px; margin: 20px 0;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                  <span style="font-size: 12px; font-weight: 700; color: ${alertColor}; text-transform: uppercase;">
+                    ${isHealthy ? '✅ ශාක තත්ත්වය: නිරෝගීයි' : '⚠️ හඳුනාගත් රෝගය (Detected Disease)'}
+                  </span>
+                  <span style="background-color: ${alertColor}; color: white; padding: 3px 10px; border-radius: 9999px; font-size: 12px; font-weight: 700;">
+                    ${diagnosisData.confidenceScore}% තහවුරුයි
+                  </span>
+                </div>
+                <div style="font-size: 22px; font-weight: 800; color: #0f172a; margin-bottom: 4px;">
+                  ${diagnosisData.diseaseName}
+                </div>
+                ${diagnosisData.scientificName ? `
+                  <div style="font-size: 13px; font-style: italic; color: #64748b; margin-bottom: 8px;">
+                    විද්‍යාත්මක නාමය: ${diagnosisData.scientificName}
+                  </div>
+                ` : ''}
+                ${diagnosisData.sinhalaDescription ? `
+                  <p style="font-size: 13px; color: #334155; margin: 8px 0 0 0; line-height: 1.5;">
+                    ${diagnosisData.sinhalaDescription}
+                  </p>
+                ` : ''}
+              </div>
+
+              {/* CULTIVATION DETAILS */}
+              <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 18px; margin-bottom: 20px; font-size: 13px;">
+                <table style="width: 100%;">
+                  <tr>
+                    <td style="color: #64748b; font-weight: 600; width: 140px;">🌱 වී ප්‍රභේදය (Variety):</td>
+                    <td style="color: #0f172a; font-weight: 700;">${diagnosisData.cropVariety || 'වී වගාව'}</td>
+                  </tr>
+                  <tr>
+                    <td style="color: #64748b; font-weight: 600;">🌾 කුඹුරු ඉඩම (Field):</td>
+                    <td style="color: #0f172a; font-weight: 700;">${diagnosisData.fieldName || 'ප්‍රධාන කුඹුර'}</td>
+                  </tr>
+                </table>
+              </div>
+
+              {/* CHEMICAL TREATMENTS */}
+              ${diagnosisData.chemicalRemedies ? `
+              <div style="background-color: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; padding: 16px; margin-bottom: 18px;">
+                <h3 style="margin: 0 0 8px 0; font-size: 14px; font-weight: 700; color: #1e40af;">
+                  🧪 කෘෂිකර්ම දෙපාර්තමේන්තුවේ නිර්දේශිත රසායනික ප්‍රතිකාර (DOA Chemical Dosages):
+                </h3>
+                <div style="font-size: 13px; color: #1e3a8a; line-height: 1.6;">
+                  ${diagnosisData.chemicalRemedies}
+                </div>
+              </div>
+              ` : ''}
+
+              {/* ORGANIC & CULTURAL REMEDIES */}
+              ${diagnosisData.organicRemedies ? `
+              <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 16px; margin-bottom: 20px;">
+                <h3 style="margin: 0 0 8px 0; font-size: 14px; font-weight: 700; color: #166534;">
+                  🍃 කාබනික & ගොවිතැන් කළමනාකරණ පිළියම් (Organic / Cultural Practices):
+                </h3>
+                <div style="font-size: 13px; color: #14532d; line-height: 1.6;">
+                  ${diagnosisData.organicRemedies}
+                </div>
+              </div>
+              ` : ''}
+
+              {/* ADVISORY NOTE */}
+              <div style="background-color: #fffbeb; border: 1px solid #fef3c7; border-radius: 10px; padding: 12px; font-size: 12px; color: #92400e; margin-bottom: 24px;">
+                💡 <strong>කෘෂි උපදෙස:</strong> බෙහෙත් ඉසීමට පෙර කුඹුරේ ජලය අඟල් 1-2 දක්වා අඩු කරන්න. සුළං රහිත උදෑසන හෝ සවස් කාලයේ ඉසින්න. වැඩිදුර විස්තර සඳහා ඔබේ කෘෂිකර්ම පර්යේෂණ නිෂ්පාදන සහකාර (ARPA) මහතා හමුවන්න.
+              </div>
+
+              {/* BUTTON */}
+              <div style="text-align: center; margin: 24px 0 8px 0;">
+                <a href="http://localhost:5173/disease" style="background-color: #15803d; color: white; padding: 13px 28px; text-decoration: none; border-radius: 10px; font-weight: 700; font-size: 14px; display: inline-block; box-shadow: 0 4px 6px -1px rgba(21, 128, 61, 0.3);">
+                  🔍 View Full AI Diagnosis in PaddyWise Portal
+                </a>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div style="background-color: #f8fafc; border-top: 1px solid #e2e8f0; padding: 16px; text-align: center; font-size: 12px; color: #94a3b8;">
+              <p style="margin: 0; font-weight: 600; color: #64748b;">PaddyWise Smart Agriculture Platform • AI Pathology Engine</p>
+              <p style="margin: 4px 0 0 0;">Helpline: <strong>+94 81 234 5678</strong> | Department of Agriculture Sri Lanka</p>
+            </div>
+          </div>
+        `,
+      });
+      console.log(`[EmailService] Disease advisory email dispatched to ${recipientEmail}`);
+    } catch (error) {
+      console.error('[EmailService] Failed to send disease advisory email:', error);
+    }
+  }
+
   async getAdvisorsList() {
     return [
       {
